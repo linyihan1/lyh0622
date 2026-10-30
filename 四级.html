@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 手机版视口配置，viewport‑fit=cover支持全面屏安全区 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>图像解决方案‑手机版底部Tab导航</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            /* 给底部Tab预留高度 + 手机安全底部距离 */
+            padding-bottom: calc(60px + env(safe-area-inset-bottom));
+            background-color: #f5f5f5;
+        }
+        /* 电脑端模拟手机：页面居中，固定430px宽度，还原项目手机版演示效果 */
+        @media (min‑width:431px) {
+            body {
+                max‑width:430px;
+                margin:0 auto;
+                background:#000000;
+            }
+            .page‑wrap{
+                background:#f5f5f5;
+                min‑height:100vh;
+            }
+        }
+        .page‑wrap{
+            min‑height:100vh;
+            padding:30px 16px;
+        }
+
+        /* ========= 【原代码完全不变】底部Tab栏样式，对应 css/mobile.css ========= */
+        .lyh-tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            /*适配iPhone底部手势条安全区*/
+            padding-bottom: env(safe-area-inset-bottom);
+            background-color: #ffffff;
+            border-top: 1px solid #eeeeee;
+            display: flex;
+            z-index: 99;
+        }
+        .lyh-tab-item {
+            flex: 1;  /* 自适应均分宽度，实验核心要求 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #666666;
+            position: relative;
+        }
+        /* SVG图标基础样式 */
+        .lyh-icon {
+            width: 24px;
+            height: 24px;
+            fill: #666666;
+            margin-bottom: 3px;
+        }
+        /* active激活：唯品会主色 #f10180 */
+        .lyh-tab-item.active .lyh-icon {
+            fill: #f10180;
+        }
+        .lyh-tab-item.active span {
+            color: #f10180;
+        }
+        .lyh-tab-item span {
+            font-size: 12px;
+        }
+        /* 购物车角标 */
+        .lyh-badge {
+            position: absolute;
+            top: 2px;
+            right: 50%;
+            transform: translateX(8px);
+            background-color: #f10180;
+            color: white;
+            font-size: 10px;
+            padding: 1px 4px;
+            border-radius: 10px;
+            min-width: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+    <h2 style="text‑align:center;margin‑bottom:20px;">唯品会手机版‑底部导航</h2>
+    <p style="font‑size:14px;color:#666;text‑align:center;">点击导航测试高亮切换，购物车带数量角标</p>
+</div>
+
+<script>
+// ======================【原代码完全不变】1、模拟 js/icons.js：动态注入SVG Symbol图标精灵 ======================
+const svgSprite = `
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden;">
+  <!--首页图标-->
+  <symbol id="lyh-i-home" viewBox="0 0 1024 1024">
+    <path d="M512 128L128 448v448h256V640h256v256h256V448L512 128z"></path>
+  </symbol>
+  <!--分类图标-->
+  <symbol id="lyh-i-category" viewBox="0 0 1024 1024">
+    <path d="M192 192h192v192H192V192z m256 0h192v192H448V192z m-256 256h192v192H192V448z m256 0h192v192H448V448z"></path>
+  </symbol>
+  <!--特卖图标-->
+  <symbol id="lyh-i-sale" viewBox="0 0 1024 1024">
+    <path d="M832 192H192c-17.7 0-32 14.3-32 32v224l320 384 320-384V224c0-17.7-14.3-32-32-32z"></path>
+  </symbol>
+  <!--购物车图标-->
+  <symbol id="lyh-i-cart" viewBox="0 0 1024 1024">
+    <path d="M896 320H128l128 448h512l128-448zM320 832a64 64 0 100 128 64 64 0 000-128zm384 0a64 64 0 100 128 64 64 0 000-128z"></path>
+  </symbol>
+  <!--我的图标-->
+  <symbol id="lyh-i-user" viewBox="0 0 1024 1024">
+    <path d="M512 512a192 192 0 100-384 192 192 0 000 384zm320 320c0-176.64-143.36-320-320-320S192 655.36 192 832h640z"></path>
+  </symbol>
+</svg>`;
+// 将精灵插入页面头部
+document.body.insertAdjacentHTML('afterbegin', svgSprite);
+
+
+// ======================【原代码完全不变】2、模拟 js/mobile.js：动态生成底部Tab导航 ======================
+// tab配置数组
+const tabList = [
+    { href:"#", icon:"lyh-i-home", text:"首页" },
+    { href:"#category", icon:"lyh-i-category", text:"分类" },
+    { href:"#sale", icon:"lyh-i-sale", text:"特卖" },
+    { href:"#cart", icon:"lyh-i-cart", text:"购物车", badge:3 },
+    { href:"#member", icon:"lyh-i-user", text:"我的" }
+];
+
+// 拼接tab栏HTML
+let tabHtml = `<nav class="lyh-tab-bar">`;
+tabList.forEach(item=>{
+    tabHtml += `<a href="${item.href}" class="lyh-tab-item">
+        <svg class="lyh-icon"><use href="#${item.icon}"></use></svg>
+        <span>${item.text}</span>
+        ${item.badge ? `<i class="lyh-badge">${item.badge}</i>` : ""}
+    </a>`;
+});
+tabHtml += `</nav>`;
+
+// 将导航插入页面末尾
+document.body.insertAdjacentHTML('beforeend', tabHtml);
+
+
+// ======================【原代码完全不变】3、自动设置当前页高亮（模拟项目页面判断逻辑）======================
+// 默认给第一个tab（首页）加上active
+const tabItems = document.querySelectorAll('.lyh-tab-item');
+tabItems[0].classList.add("active");
+
+// 点击切换高亮演示
+tabItems.forEach((item,idx)=>{
+    item.addEventListener("click",function(e){
+        e.preventDefault();
+        tabItems.forEach(t=>t.classList.remove("active"));
+        this.classList.add("active");
+    })
+})
+</script>
+</body>
+</html>

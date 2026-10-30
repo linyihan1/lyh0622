@@ -1,0 +1,38 @@
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.tab-nav{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+display: flex;
+justify-content: space-between;
+align-items: center;
+background-color: rgb(1, 47, 87);
+width: 100%;
+border-top: 1px solid rgb(18, 133, 234) ;
+}
+.tab-item{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgb(219, 9, 242);
+}
+.tab-item svg{
+    font-size: 24px;
+    margin: 5px;
+}
+.tab-item.active{
+    color: brown;
+}

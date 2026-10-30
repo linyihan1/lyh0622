@@ -1,0 +1,47 @@
+# ========== IDE / Trae ==========
+.vscode/
+.trae/
+.trae-cn/
+.opencode/
+.workbuddy/
+.ai_completion/
+.codex/
+
+# ========== OS / Thumbs ==========
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ========== Trae / Agent Work Files ==========
+lyh_prompt.md
+
+# ========== Downloads / Temp ==========
+*.tmp
+*.log
+*.bak
+
+# ========== Node / Python ==========
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# ========== Binary Documents ==========
+# Keep .html / .css / .js / .md / .txt / .svg / .woff2 only
+*.docx
+*.doc
+*.pptx
+*.pdf
+*.xlsx
+*.zip
+*.exe
+*.lnk
+
+# ========== Fonts (downloaded binaries) ==========
+# 这些是本地下载的字体资源，但 cdn/ 下的 css 和 js 保留
+# cdn/fontawesome/webfonts/*.woff2   ← 保留 woff2（小且必要）
+# cdn/fontawesome/webfonts/*.ttf     ← 排除（冗余大）
+# cdn/lucide/lucide.min.js           ← 保留
+
+cdn/fontawesome/webfonts/*.ttf

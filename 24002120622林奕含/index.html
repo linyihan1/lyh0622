@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>林奕含的《高级网页设计》课堂实践</title>
+  <style>
+    :root{
+      --bg1:#0f172a;--bg2:#0b2545;--accent:#7dd3fc;--muted:#94a3b8
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC",sans-serif;color:#e6eef8;background:linear-gradient(180deg,var(--bg1),var(--bg2));min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px}
+    .wrap{width:100%;max-width:980px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));border-radius:12px;padding:28px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+    header{display:flex;align-items:center;gap:16px}
+    .logo{width:68px;height:68px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#60a5fa);display:flex;align-items:center;justify-content:center;color:#05263a;font-weight:700;font-size:20px}
+    h1{margin:0;font-size:20px}
+    p.lead{margin:6px 0 0;color:var(--muted);font-size:14px}
+
+    .grid{display:flex;gap:18px;margin-top:22px}
+    nav{flex:1}
+    .card{background:rgba(255,255,255,0.02);padding:16px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+    ul{list-style:none;padding:0;margin:0}
+    li{padding:12px 10px;border-radius:8px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent)}
+    a.link{color:var(--accent);text-decoration:none;font-weight:600}
+    .meta{color:var(--muted);font-size:13px}
+
+    .prompt{white-space:pre-wrap;background:rgba(0,0,0,0.35);padding:12px;border-radius:8px;color:#dbeafe;margin-top:14px;font-size:13px}
+    footer{margin-top:18px;text-align:right;color:var(--muted);font-size:13px}
+    @media(max-width:680px){.grid{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">林奕含</div>
+      <div>
+        <h1>林奕含的《高级网页设计》课堂实践</h1>
+        <p class="lead">课堂目录 · 实践项目 · 原生代码示例</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <nav class="card">
+        <h3 style="margin-top:0">课堂目录</h3>
+        <ul>
+          <li><span>Flex 布局复习</span><a class="link" href="./flex.html" target="page-view">打开</a></li>
+          <li><span>SVG 图标</span><a class="link" href="./1.html" target="page-view">打开</a></li>
+          <li><span>数字类型与运算符</span><a class="link" href="./9.23.html" target="page-view">打开</a></li>
+          <li><span>JS 对象</span><a class="link" href="./9.30.html" target="page-view">打开</a></li>
+          <li><span>JS 对象的应用</span><a class="link" href="./10.9.html" target="page-view">打开</a></li>
+          <li><span>SVG 图标与徽章</span><a class="link" href="./9.9.html" target="page-view">打开</a></li>
+          <li><span>猜数字游戏</span><a class="link" href="./10.10.html" target="page-view">打开</a></li>
+          <li><span>其余模块</span><span class="meta">后续在增加</span></li>
+        </ul>
+
+        <div class="prompt" aria-label="页面包含的提示词">
+创建一个新页面，包括本目录下的所有网页，并在 index.html 中提供统一入口，使用原生代码，新页面名称为 index.html，主题为林奕含的《高级网页设计》课堂实践，美化页面，课堂目录中包含 Flex 复习、SVG 图标和其他课堂模块。页面中包括本提示词。
+        </div>
+      </nav>
+
+      <section class="card" style="flex:1.2">
+        <h3 style="margin-top:0">课堂页面预览</h3>
+        <p style="color:var(--muted)">选择左侧目录中的页面，即可在这里查看；每个页面的原有内容和交互保持独立。部分 JavaScript 示例会将结果输出到浏览器控制台。</p>
+        <iframe
+          name="page-view"
+          title="课堂页面预览"
+          src="./flex.html"
+          style="display:block;width:100%;height:620px;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:#fff"
+        ></iframe>
+        <footer>共收录本目录中的 7 个课堂 HTML 页面。</footer>
+      </section>
+    </div>
+  </div>
+</body>
+</html>

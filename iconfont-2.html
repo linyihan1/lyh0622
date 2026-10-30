@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucide — Fonts of the Trade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ LYH DESIGN TOKENS ============ */
+:root {
+  --lyh-ink: #0D0D0D;
+  --lyh-slate: #1A1F2B;
+  --lyh-bone: #EDE8DF;
+  --lyh-ash: #7A7F8A;
+  --lyh-brass: #C8A951;
+  --lyh-sage: #6B8F71;
+  --lyh-border: 1px solid rgba(122, 127, 138, 0.25);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  background: var(--lyh-ink);
+  color: var(--lyh-bone);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============ NAV ============ */
+.lyh-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  padding: 28px 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  border-bottom: 1px solid rgba(122, 127, 138, 0.12);
+  background: rgba(13, 13, 13, 0.7);
+  backdrop-filter: blur(12px);
+}
+.lyh-nav-brand {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+  color: var(--lyh-bone);
+  text-decoration: none;
+}
+.lyh-nav-brand em {
+  color: var(--lyh-brass);
+  font-style: italic;
+}
+.lyh-nav-links a {
+  color: var(--lyh-ash);
+  text-decoration: none;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  margin-left: 36px;
+  transition: color 0.2s;
+}
+.lyh-nav-links a:hover,
+.lyh-nav-links a.lyh-nav-active {
+  color: var(--lyh-brass);
+}
+
+/* ============ HERO ============ */
+.lyh-hero {
+  min-height: 100vh;
+  padding: 140px 56px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  align-items: center;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.lyh-hero-text { padding-right: 60px; }
+.lyh-hero-subtitle {
+  color: var(--lyh-sage);
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  margin-bottom: 28px;
+  font-weight: 500;
+}
+.lyh-hero-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-size: clamp(3.5rem, 7vw, 6.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 32px;
+}
+.lyh-hero-divider {
+  width: 48px;
+  height: 1px;
+  background: var(--lyh-sage);
+  margin-bottom: 32px;
+}
+.lyh-hero-desc {
+  color: var(--lyh-ash);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  max-width: 420px;
+  font-weight: 300;
+}
+.lyh-hero-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.lyh-hero-art svg.lyh-hero-icon {
+  width: clamp(160px, 28vw, 340px);
+  height: clamp(160px, 28vw, 340px);
+  color: var(--lyh-sage);
+  stroke-width: 1.2;
+}
+.lyh-hero-stats {
+  position: absolute;
+  bottom: 40px;
+  right: 10%;
+  text-align: left;
+}
+.lyh-hero-stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--lyh-bone);
+  line-height: 1;
+}
+.lyh-hero-stat-label {
+  color: var(--lyh-ash);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  margin-top: 8px;
+}
+
+/* ============ SECTION ============ */
+.lyh-section {
+  padding: 100px 56px;
+  max-width: 1600px;
+  margin: 0 auto;
+  border-top: 1px solid rgba(122, 127, 138, 0.18);
+}
+.lyh-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 64px;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.lyh-section-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.lyh-section-meta {
+  color: var(--lyh-ash);
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  font-weight: 400;
+}
+
+/* ============ ICON GRID — ASYMMETRIC ============ */
+.lyh-grid {
+  display: grid;
+  gap: 2px;
+}
+.lyh-grid-row {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+.lyh-grid-row[data-lyh-cols="3"] { grid-template-columns: repeat(3, 1fr); }
+.lyh-grid-row[data-lyh-cols="4"] { grid-template-columns: repeat(4, 1fr); }
+.lyh-grid-row[data-lyh-cols="5"] { grid-template-columns: repeat(5, 1fr); }
+
+.lyh-icon-card {
+  position: relative;
+  background: var(--lyh-slate);
+  border: 1px solid rgba(122, 127, 138, 0.18);
+  padding: 48px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  transition: border-color 0.25s, background 0.25s;
+}
+.lyh-icon-card:hover {
+  border-color: var(--lyh-sage);
+  background: rgba(107, 143, 113, 0.04);
+}
+.lyh-icon-card svg {
+  width: 2.6rem;
+  height: 2.6rem;
+  color: var(--lyh-bone);
+  stroke-width: 1.5;
+  transition: color 0.25s, transform 0.25s;
+}
+.lyh-icon-card:hover svg {
+  color: var(--lyh-sage);
+  transform: translateY(-3px);
+}
+.lyh-icon-card-label {
+  font-size: 0.72rem;
+  color: var(--lyh-ash);
+  letter-spacing: 0.1em;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+}
+.lyh-icon-card-num {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.75rem;
+  color: var(--lyh-ash);
+  opacity: 0.45;
+}
+
+/* ============ STYLES COMPARE ============ */
+.lyh-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin-top: 64px;
+}
+.lyh-compare-col {
+  border-top: 1px solid rgba(122, 127, 138, 0.18);
+  padding-top: 32px;
+}
+.lyh-compare-col h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+.lyh-compare-col p {
+  color: var(--lyh-ash);
+  font-size: 0.88rem;
+  line-height: 1.75;
+  font-weight: 300;
+  margin-bottom: 24px;
+}
+.lyh-compare-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lyh-compare-col ul li {
+  color: var(--lyh-bone);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lyh-compare-col ul li svg {
+  width: 16px;
+  height: 16px;
+  color: var(--lyh-sage);
+  flex-shrink: 0;
+}
+.lyh-compare-col.lyh-compare-alt h3 { color: var(--lyh-brass); }
+.lyh-compare-col.lyh-compare-alt ul li svg { color: var(--lyh-brass); }
+
+/* ============ FOOTER ============ */
+.lyh-footer {
+  padding: 64px 56px 40px;
+  border-top: 1px solid rgba(122, 127, 138, 0.18);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.lyh-footer-copy {
+  color: var(--lyh-ash);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+}
+.lyh-footer-nav a {
+  color: var(--lyh-ash);
+  text-decoration: none;
+  font-size: 0.78rem;
+  margin-left: 24px;
+  letter-spacing: 0.08em;
+}
+.lyh-footer-nav a:hover { color: var(--lyh-brass); }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 900px) {
+  .lyh-nav { padding: 20px 24px; }
+  .lyh-nav-links a { margin-left: 16px; font-size: 0.75rem; }
+  .lyh-hero { grid-template-columns: 1fr; padding: 120px 24px 60px; }
+  .lyh-hero-text { padding-right: 0; }
+  .lyh-hero-art { padding-top: 40px; }
+  .lyh-hero-stats { bottom: 0; right: 0; }
+  .lyh-section { padding: 64px 24px; }
+  .lyh-grid-row[data-lyh-cols="3"],
+  .lyh-grid-row[data-lyh-cols="4"],
+  .lyh-grid-row[data-lyh-cols="5"] { grid-template-columns: repeat(2, 1fr); }
+  .lyh-compare { grid-template-columns: 1fr; gap: 32px; }
+  .lyh-footer { padding: 48px 24px 24px; }
+}
+@media (max-width: 500px) {
+  .lyh-grid-row[data-lyh-cols="3"],
+  .lyh-grid-row[data-lyh-cols="4"],
+  .lyh-grid-row[data-lyh-cols="5"] { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="lyh-nav">
+  <a href="index.html" class="lyh-nav-brand">Fonts<em>.</em>of<em>.</em>the<em>.</em>Trade</a>
+  <div class="lyh-nav-links">
+    <a href="index.html">Home</a>
+    <a href="iconfont-1.html">Font Awesome</a>
+    <a href="iconfont-2.html" class="lyh-nav-active">Lucide</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="lyh-hero">
+  <div class="lyh-hero-text">
+    <div class="lyh-hero-subtitle">THE LINE AS FORM</div>
+    <h1 class="lyh-hero-title">Lucide.<br>Pure SVG.</h1>
+    <div class="lyh-hero-divider"></div>
+    <p class="lyh-hero-desc">
+      一套开源的线条图标集。每个符号都是纯净的 SVG —— 矢量、可编辑、
+      零字体依赖。在任何分辨率下锐利无比。
+    </p>
+  </div>
+  <div class="lyh-hero-art">
+    <i data-lucide="feather" class="lyh-hero-icon"></i>
+    <div class="lyh-hero-stats">
+      <div class="lyh-hero-stat-num">1400+</div>
+      <div class="lyh-hero-stat-label">LINE ICONS</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED ICONS — 不对称网格 -->
+<section class="lyh-section">
+  <div class="lyh-section-header">
+    <h2 class="lyh-section-title">A selection from<br>the studio.</h2>
+    <div class="lyh-section-meta">ICONOGRAPHY · OPEN SOURCE</div>
+  </div>
+
+  <div class="lyh-grid">
+    <div class="lyh-grid-row" data-lyh-cols="5">
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">01</span><i data-lucide="crown"></i><div class="lyh-icon-card-label">Crown</div></div>
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">02</span><i data-lucide="feather"></i><div class="lyh-icon-card-label">Feather</div></div>
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">03</span><i data-lucide="diamond"></i><div class="lyh-icon-card-label">Diamond</div></div>
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">04</span><i data-lucide="sparkles"></i><div class="lyh-icon-card-label">Sparkles</div></div>
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">05</span><i data-lucide="palette"></i><div class="lyh-icon-card-label">Palette</div></div>
+    </div>
+    <div class="lyh-grid-row" data-lyh-cols="3">
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">06</span><i data-lucide="landmark"></i><div class="lyh-icon-card-label">Landmark</div></div>
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">07</span><i data-lucide="mountain-snow"></i><div class="lyh-icon-card-label">Mountain</div></div>
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">08</span><i data-lucide="flask-conical"></i><div class="lyh-icon-card-label">Flask</div></div>
+    </div>
+    <div class="lyh-grid-row" data-lyh-cols="4">
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">09</span><i data-lucide="wine"></i><div class="lyh-icon-card-label">Wine</div></div>
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">10</span><i data-lucide="coffee"></i><div class="lyh-icon-card-label">Coffee</div></div>
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">11</span><i data-lucide="book-open"></i><div class="lyh-icon-card-label">Book</div></div>
+      <div class="lyh-icon-card"><span class="lyh-icon-card-num">12</span><i data-lucide="mic"></i><div class="lyh-icon-card-label">Mic</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section class="lyh-section">
+  <div class="lyh-section-header">
+    <h2 class="lyh-section-title">SVG vs. Font.<br>Two worlds.</h2>
+    <div class="lyh-section-meta">APPROACH</div>
+  </div>
+
+  <div class="lyh-compare">
+    <div class="lyh-compare-col">
+      <h3>Lucide — SVG</h3>
+      <p>每一个图标都是原生的 SVG 节点 —— 可以直接填充颜色、调整 stroke-width、
+      甚至用 CSS 动画 path。没有字体加载闪烁，没有跨平台渲染差异。</p>
+      <ul>
+        <li><i data-lucide="check"></i> 矢量无损缩放</li>
+        <li><i data-lucide="check"></i> 可逐路径动画</li>
+        <li><i data-lucide="check"></i> 零字体依赖</li>
+        <li><i data-lucide="check"></i> Tree-shakable</li>
+      </ul>
+    </div>
+    <div class="lyh-compare-col lyh-compare-alt">
+      <h3>Font Awesome — Font</h3>
+      <p>用 @font-face 把图标做成字体字形 —— 一行 class 即可调用，
+      适合文字流内联，但受到字体渲染和字符映射的约束。</p>
+      <ul>
+        <li><i data-lucide="check"></i> CSS class 即用</li>
+        <li><i data-lucide="check"></i> 文字流内联友好</li>
+        <li><i data-lucide="check"></i> 多 weight 风格</li>
+        <li><i data-lucide="check"></i> Brand logos 齐全</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="lyh-footer">
+  <div class="lyh-footer-copy">© 2026 FONTS OF THE TRADE · CRAFTED WITH CARE</div>
+  <div class="lyh-footer-nav">
+    <a href="index.html">Home</a>
+    <a href="iconfont-1.html">FA</a>
+    <a href="iconfont-2.html">Lucide</a>
+  </div>
+</footer>
+
+<!-- LUCIDE UMD -->
+<script src="cdn/lucide/lucide.min.js"></script>
+<script>
+  // lyh-prefixed variable wrapping the global lucide object
+  const lyhLucide = (typeof lucide !== 'undefined') ? lucide : null;
+  document.addEventListener('DOMContentLoaded', function lyhInitLucide() {
+    if (lyhLucide && typeof lyhLucide.createIcons === 'function') {
+      lyhLucide.createIcons({
+        attrs: {
+          'stroke-width': 1.5,
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round'
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>
