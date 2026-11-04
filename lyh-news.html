@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<!--
+  作者: 林奕含
+  学号: 24002120622
+  创建时间: 2026-11-04 20:30
+  使用模型: Trae proprietary model
+  功能: 新闻分类 Tab 选项卡展示页（国内/省内/国际/最热四类，国内默认），外部 js/lyh-tabs.js 提供可复用切换逻辑
+-->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新闻 Tab 选项卡 — 林奕含</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
+      min-height: 100vh;
+      padding: 48px 24px;
+      color: #2c3e50;
+    }
+    .lyh_wrapper {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+    .lyh_header {
+      padding: 28px 32px 16px;
+      border-bottom: 1px solid #eef0f3;
+    }
+    .lyh_header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .lyh_header p {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #95a5a6;
+    }
+
+    /* ===== Tab 容器 ===== */
+    .lyh_tabs {
+      display: flex;
+      border-bottom: 2px solid #eef0f3;
+      background: #fafbfc;
+    }
+    .lyh_tab_btn {
+      flex: 1;
+      padding: 16px 0;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 500;
+      color: #7f8c8d;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      position: relative;
+      transition: color 0.25s ease;
+    }
+    .lyh_tab_btn:hover { color: #2c3e50; }
+    .lyh_tab_btn.lyh_tab_active {
+      color: #e67e22;  /* lyh 橘色强调 —— 与 1.jpg 原图统一 */
+      font-weight: 700;
+    }
+    /* 选中态下划线（动画） */
+    .lyh_tab_btn.lyh_tab_active::after {
+      content: "";
+      position: absolute;
+      left: 20%;
+      right: 20%;
+      bottom: -2px;
+      height: 3px;
+      background: #e67e22;  /* lyh 橘色下划线 */
+      border-radius: 2px;
+    }
+
+    /* ===== 面板 ===== */
+    .lyh_panels { padding: 28px 32px 32px; }
+    .lyh_panel {
+      display: none;          /* 默认隐藏所有面板 */
+      animation: lyhFadeIn 0.35s ease;
+    }
+    .lyh_panel.lyh_tab_active { display: block; }   /* 选中才显示 */
+    @keyframes lyhFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .lyh_news_item {
+      padding: 14px 0;
+      border-bottom: 1px dashed #eef0f3;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .lyh_news_item:last-child { border-bottom: none; }
+    .lyh_news_tag {
+      flex-shrink: 0;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: #fff;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .lyh_tag_red    { background: #e74c3c; }
+    .lyh_tag_orange { background: #e67e22; }
+    .lyh_tag_blue   { background: #3498db; }
+    .lyh_tag_purple { background: #8e44ad; }
+    .lyh_news_title {
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.6;
+      color: #2c3e50;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .lyh_news_title:hover { color: #e67e22; }
+    .lyh_news_meta {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #95a5a6;
+    }
+
+    .lyh_footer {
+      padding: 14px 32px;
+      font-size: 12px;
+      color: #bdc3c7;
+      text-align: center;
+      border-top: 1px solid #f2f3f5;
+    }
+  </style>
+</head>
+<body>
+
+<div class="lyh_wrapper">
+  <div class="lyh_header">
+    <h1>📰 新闻中心 · Tab 选项卡</h1>
+    <p>作者 林奕含 · 24002120622 · 外部 JS 模块 js/lyh-tabs.js</p>
+  </div>
+
+  <!-- Tab 按钮组：data-tab 作为唯一 key，data-default-tab 标记默认项（国内） -->
+  <div class="lyh_tabs" id="lyh_news_tabs">
+    <button class="lyh_tab_btn" data-tab="domestic" data-default-tab>🏠 国内新闻</button>
+    <button class="lyh_tab_btn" data-tab="province">🏞️ 省内新闻</button>
+    <button class="lyh_tab_btn" data-tab="international">🌍 国际新闻</button>
+    <button class="lyh_tab_btn" data-tab="hot">🔥 最热新闻</button>
+  </div>
+
+  <!-- Tab 内容面板：data-panel 与按钮 data-tab 一一对应 -->
+  <div class="lyh_panels">
+
+    <!-- 国内新闻（默认选中） -->
+    <div class="lyh_panel" data-panel="domestic">
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_red">要闻</span>
+        <div>
+          <div class="lyh_news_title">全国科技创新大会在北京召开，部署下一阶段科技体制改革重点</div>
+          <div class="lyh_news_meta">新华社 · 10 分钟前 · 2.1 万阅读</div>
+        </div>
+      </div>
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_red">政策</span>
+        <div>
+          <div class="lyh_news_title">国务院发布促进民营经济发展若干措施，涉及融资、准入、维权三大领域</div>
+          <div class="lyh_news_meta">人民日报 · 38 分钟前 · 1.6 万阅读</div>
+        </div>
+      </div>
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_red">民生</span>
+        <div>
+          <div class="lyh_news_title">全国多地启动今冬供暖准备工作，部分高寒地区已提前供暖</div>
+          <div class="lyh_news_meta">央视新闻 · 1 小时前 · 8,900 阅读</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 省内新闻 -->
+    <div class="lyh_panel" data-panel="province">
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_orange">本地</span>
+        <div>
+          <div class="lyh_news_title">省政府召开数字经济发展推进会，目标 2026 年核心产业规模破万亿</div>
+          <div class="lyh_news_meta">省日报 · 22 分钟前 · 6,400 阅读</div>
+        </div>
+      </div>
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_orange">交通</span>
+        <div>
+          <div class="lyh_news_title">省内新开通 3 条城际公交快线，覆盖 5 个地级市通勤需求</div>
+          <div class="lyh_news_meta">交通广播 · 55 分钟前 · 3,200 阅读</div>
+        </div>
+      </div>
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_orange">教育</span>
+        <div>
+          <div class="lyh_news_title">省教育厅：新增 12 所省级示范高中，2026 年起扩大招生规模</div>
+          <div class="lyh_news_meta">教育在线 · 2 小时前 · 4,100 阅读</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 国际新闻 -->
+    <div class="lyh_panel" data-panel="international">
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_blue">全球</span>
+        <div>
+          <div class="lyh_news_title">联合国气候变化大会达成新协议，2030 碳减排目标写入决议</div>
+          <div class="lyh_news_meta">环球时报 · 8 分钟前 · 3.8 万阅读</div>
+        </div>
+      </div>
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_blue">科技</span>
+        <div>
+          <div class="lyh_news_title">SpaceX 星舰第 7 次试飞成功回收，火星载人计划提速</div>
+          <div class="lyh_news_meta">BBC 中文 · 42 分钟前 · 2.5 万阅读</div>
+        </div>
+      </div>
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_blue">经济</span>
+        <div>
+          <div class="lyh_news_title">美联储暗示年内可能再度降息，全球股市应声上涨</div>
+          <div class="lyh_news_meta">华尔街见闻 · 1 小时前 · 1.9 万阅读</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 最热新闻 -->
+    <div class="lyh_panel" data-panel="hot">
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_purple">热 1</span>
+        <div>
+          <div class="lyh_news_title">⚡ 国足世预赛绝杀韩国！现场视频引爆全网</div>
+          <div class="lyh_news_meta">微博热搜 · 3 分钟前 · 128 万阅读</div>
+        </div>
+      </div>
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_purple">热 2</span>
+        <div>
+          <div class="lyh_news_title">🎬 国产科幻电影票房破 30 亿，超越好莱坞同期大片</div>
+          <div class="lyh_news_meta">豆瓣 · 15 分钟前 · 56 万阅读</div>
+        </div>
+      </div>
+      <div class="lyh_news_item">
+        <span class="lyh_news_tag lyh_tag_purple">热 3</span>
+        <div>
+          <div class="lyh_news_title">🐱 小区流浪猫被投喂成"橘猪"，业主纷纷晒照</div>
+          <div class="lyh_news_meta">小红书 · 28 分钟前 · 34 万阅读</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="lyh_footer">
+    Tab 切换逻辑：监听点击 → 清除所有选中态 → 设置当前选中态 · 可复用
+  </div>
+</div>
+
+<!-- 外部引用可复用 Tab 模块 -->
+<script src="js/lyh-tabs.js" defer></script>
+
+</body>
+</html>
