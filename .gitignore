@@ -1,3 +1,6 @@
+# ========== Deploy Tools ==========
+.netlify/
+
 # ========== IDE / Trae ==========
 .vscode/
 .trae/
