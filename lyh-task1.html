@@ -1,0 +1,264 @@
+<!--
+  lyh_html_head_comment: 作者林奕含 · 学号24002120622 · 时间2026-11-11 · 模型Trae proprietary model · 任务一演示页：提示词工程师让AI生成Swiper配置·两轮迭代可视化+实跑cube效果
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>任务一 · 提示词工程师 | 24002120622 林奕含</title>
+  <!-- lyh_cdn_swiper: 引入 Swiper 样式和脚本，用于任务一 cube 效果实跑演示 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <style>
+    /* lyh_reset —— 全局重置 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    /* lyh_wrapper —— 页面容器，最大宽度居中 */
+    .lyh_wrapper { max-width: 960px; margin: 0 auto; }
+
+    /* lyh_header —— 标题区 */
+    .lyh_header { text-align: center; margin-bottom: 48px; }
+    .lyh_header h1 {
+      font-size: 32px; font-weight: 700; letter-spacing: 2px;
+      background: linear-gradient(90deg, #e67e22, #f39c12);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .lyh_header .lyh_sub { color: #888; margin-top: 8px; font-size: 14px; letter-spacing: 1px; }
+
+    /* lyh_section —— 通用区块 */
+    .lyh_section {
+      background: #16213e; border-radius: 12px; padding: 28px;
+      margin-bottom: 32px; border: 1px solid #2a2a4a;
+    }
+    .lyh_section h2 {
+      font-size: 20px; margin-bottom: 16px; color: #fff;
+      padding-bottom: 12px; border-bottom: 2px solid #e67e22;
+    }
+    .lyh_section h2 .lyh_badge {
+      display: inline-block; background: #e67e22; color: #fff;
+      font-size: 12px; padding: 2px 10px; border-radius: 20px;
+      margin-left: 10px; letter-spacing: 1px;
+    }
+
+    /* lyh_req_list —— 需求列表 */
+    .lyh_req_list { list-style: none; }
+    .lyh_req_list li {
+      padding: 12px 16px; margin-bottom: 8px;
+      background: #0f3460; border-radius: 8px;
+      font-size: 15px; line-height: 1.6;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .lyh_req_list li::before { content: "📌"; }
+
+    /* lyh_round —— 两轮 AI 输出对比 */
+    .lyh_round {
+      background: #0f3460; border-radius: 10px;
+      padding: 20px; margin-bottom: 20px;
+      border-left: 4px solid #f39c12;
+    }
+    .lyh_round.lyh_green { border-left-color: #27ae60; }
+    .lyh_round_header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px;
+    }
+    .lyh_round_title { font-size: 16px; font-weight: 600; color: #fff; }
+    .lyh_round_tag {
+      font-size: 12px; padding: 3px 12px; border-radius: 20px;
+      background: #e74c3c; color: #fff;
+    }
+    .lyh_round.lyh_green .lyh_round_tag { background: #27ae60; }
+
+    /* lyh_code —— 代码展示区 */
+    .lyh_code {
+      background: #0a0a1a; border-radius: 8px; padding: 16px;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 13px; line-height: 1.7; color: #a5d6a7;
+      overflow-x: auto; white-space: pre;
+    }
+    .lyh_code .lyh_missing { color: #ff6b6b; text-decoration: line-through; }
+    .lyh_code .lyh_keyword { color: #c792ea; }
+    .lyh_code .lyh_string  { color: #c3e88d; }
+    .lyh_code .lyh_comment { color: #546e7a; font-style: italic; }
+
+    /* lyh_diff —— 差异对比表 */
+    .lyh_diff { margin-top: 14px; width: 100%; border-collapse: collapse; font-size: 14px; }
+    .lyh_diff th, .lyh_diff td {
+      padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2a4a;
+    }
+    .lyh_diff th { color: #888; font-weight: 500; background: #0a0a1a; }
+    .lyh_diff .lyh_ok   { color: #27ae60; font-weight: 600; }
+    .lyh_diff .lyh_bad  { color: #e74c3c; font-weight: 600; }
+
+    /* lyh_demo —— cube 实跑演示区 */
+    .lyh_demo .swiper {
+      width: 100%; height: 420px; border-radius: 12px; overflow: hidden;
+    }
+    .lyh_demo .swiper-slide {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 700; color: #fff;
+    }
+    .lyh_demo .swiper-slide:nth-child(1) { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .lyh_demo .swiper-slide:nth-child(2) { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .lyh_demo .swiper-slide:nth-child(3) { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+    .lyh_demo .swiper-slide:nth-child(4) { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+    .lyh_demo .swiper-slide:nth-child(5) { background: linear-gradient(135deg, #fa709a, #fee140); }
+    .lyh_demo .swiper-slide:nth-child(6) { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+
+    /* lyh_hint —— 演示区下方操作提示 */
+    .lyh_hint {
+      margin-top: 16px; padding: 12px 16px;
+      background: #0f3460; border-radius: 8px;
+      font-size: 14px; color: #aaa; line-height: 1.8;
+    }
+    .lyh_hint code {
+      background: #e67e22; color: #fff; padding: 2px 8px; border-radius: 4px;
+      font-family: "Consolas", monospace; font-size: 12px;
+    }
+
+    /* lyh_back —— 返回链接 */
+    .lyh_back {
+      display: inline-block; margin-bottom: 24px;
+      color: #e67e22; text-decoration: none; font-size: 14px;
+    }
+    .lyh_back:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="lyh_wrapper">
+
+    <a href="index.html" class="lyh_back">← 返回首页</a>
+
+    <!-- lyh_header —— 标题区 -->
+    <div class="lyh_header">
+      <h1>任务一 · 提示词工程师</h1>
+      <p class="lyh_sub">让 AI 听懂需求 · 两轮迭代可视化 · 24002120622 林奕含</p>
+    </div>
+
+    <!-- lyh_section 1 —— 老师给的 4 条原始需求 -->
+    <div class="lyh_section">
+      <h2>老师给的原始需求 <span class="lyh_badge">需求拆解</span></h2>
+      <ul class="lyh_req_list">
+        <li>无缝循环（loop）</li>
+        <li>3.2 秒自动翻页，且手动操作后不停止（autoplay + disableOnInteraction）</li>
+        <li>圆点分页器可点击（pagination.clickable）</li>
+        <li>初始效果为 cube 3D 立方体</li>
+      </ul>
+    </div>
+
+    <!-- lyh_section 2 —— AI 两轮迭代对比 -->
+    <div class="lyh_section">
+      <h2>AI 两轮迭代过程 <span class="lyh_badge">提示词精确性 → AI 输出验证</span></h2>
+
+      <!-- lyh_round 1 —— 第一轮输出（有遗漏） -->
+      <div class="lyh_round">
+        <div class="lyh_round_header">
+          <span class="lyh_round_title">🔴 第 1 轮：AI 第一次给的代码（有遗漏）</span>
+          <span class="lyh_round_tag">2 / 4 满足</span>
+        </div>
+        <pre class="lyh_code"><code><span class="lyh_keyword">var</span> <span class="lyh_string">swiper</span> = <span class="lyh_keyword">new</span> <span class="lyh_string">Swiper</span>(<span class="lyh_string">'#wySw4'</span>, {
+  <span class="lyh_string">loop</span>: <span class="lyh_keyword">true</span>,
+  <span class="lyh_string">autoplay</span>: {
+    <span class="lyh_string">delay</span>: <span class="lyh_keyword">3200</span>,
+  },<span class="lyh_missing">
+  // ❌ 漏了 disableOnInteraction: false
+  // 用户拖一下 autoplay 就停了（默认 true）</span>
+  <span class="lyh_string">pagination</span>: {
+    <span class="lyh_string">el</span>: <span class="lyh_string">'#wyPag4'</span>,<span class="lyh_missing">
+    // ❌ 漏了 clickable: true
+    // 圆点只能看不能点（默认 false）</span>
+  },
+  <span class="lyh_string">effect</span>: <span class="lyh_string">'cube'</span>,
+});</code></pre>
+      </div>
+
+      <!-- lyh_round 2 —— 第二轮输出（正确） -->
+      <div class="lyh_round lyh_green">
+        <div class="lyh_round_header">
+          <span class="lyh_round_title">🟢 第 2 轮：精准对齐后（正确版）</span>
+          <span class="lyh_round_tag">4 / 4 满足</span>
+        </div>
+        <pre class="lyh_code"><code><span class="lyh_keyword">var</span> <span class="lyh_string">swiper</span> = <span class="lyh_keyword">new</span> <span class="lyh_string">Swiper</span>(<span class="lyh_string">'#wySw4'</span>, {
+  <span class="lyh_string">loop</span>: <span class="lyh_keyword">true</span>,
+  <span class="lyh_string">autoplay</span>: {
+    <span class="lyh_string">delay</span>: <span class="lyh_keyword">3200</span>,
+    <span class="lyh_string">disableOnInteraction</span>: <span class="lyh_keyword">false</span>,  <span class="lyh_comment">// ✅ 手动后继续自动翻</span>
+  },
+  <span class="lyh_string">pagination</span>: {
+    <span class="lyh_string">el</span>: <span class="lyh_string">'#wyPag4'</span>,
+    <span class="lyh_string">clickable</span>: <span class="lyh_keyword">true</span>,        <span class="lyh_comment">// ✅ 圆点可点跳转</span>
+  },
+  <span class="lyh_string">effect</span>: <span class="lyh_string">'cube'</span>,
+});</code></pre>
+      </div>
+
+      <!-- lyh_diff —— 差异对比表 -->
+      <table class="lyh_diff">
+        <thead>
+          <tr><th>需求</th><th>第 1 轮 AI 输出</th><th>第 2 轮 AI 输出</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>无缝循环</td><td class="lyh_ok">✅ loop: true</td><td class="lyh_ok">✅ loop: true</td></tr>
+          <tr><td>3.2s 自动翻页</td><td class="lyh_ok">✅ delay: 3200</td><td class="lyh_ok">✅ delay: 3200</td></tr>
+          <tr><td>手动后不停止</td><td class="lyh_bad">❌ 漏 disableOnInteraction</td><td class="lyh_ok">✅ disableOnInteraction: false</td></tr>
+          <tr><td>圆点可点击</td><td class="lyh_bad">❌ 漏 clickable</td><td class="lyh_ok">✅ clickable: true</td></tr>
+          <tr><td>初始 cube 效果</td><td class="lyh_ok">✅ effect: 'cube'</td><td class="lyh_ok">✅ effect: 'cube'</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- lyh_section 3 —— 实跑 cube 效果 -->
+    <div class="lyh_section lyh_demo">
+      <h2>最终效果实跑 <span class="lyh_badge">cube 3D 立方体</span></h2>
+
+      <!-- lyh_swiper_cube —— Swiper 容器 -->
+      <div class="swiper" id="lyh_task1_swiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide">天宫空间站</div>
+          <div class="swiper-slide">复兴号</div>
+          <div class="swiper-slide">C919 大飞机</div>
+          <div class="swiper-slide">奋斗者号</div>
+          <div class="swiper-slide">FAST 望远镜</div>
+          <div class="swiper-slide">爱达·魔都号</div>
+        </div>
+        <!-- lyh_pagination —— 可点击圆点 -->
+        <div class="swiper-pagination" id="lyh_task1_pagination"></div>
+      </div>
+
+      <!-- lyh_hint —— 操作提示 -->
+      <div class="lyh_hint">
+        🎬 <b>演示指南：</b><br>
+        • 每 <code>3.2 秒</code> 自动翻页 → cube 3D 立方体翻转效果<br>
+        • <b>用鼠标拖动它</b> → 松手后 <b>自动播放继续</b>（<code>disableOnInteraction: false</code> 生效）<br>
+        • <b>点下方圆点</b> → 直接跳到对应图片（<code>clickable: true</code> 生效）
+      </div>
+    </div>
+
+  </div>
+
+  <!-- lyh_JS: 任务一 cube 实跑初始化 -->
+  <script>
+    // lyh_task1_swiper: 用老师原始需求的 4 个参数初始化 cube 演示
+    new Swiper('#lyh_task1_swiper', {
+      loop: true,                    // lyh_需求①：无缝循环
+      speed: 800,
+      effect: 'cube',                // lyh_需求④：初始 cube 3D
+      cubeEffect: { slideShadows: true },
+      autoplay: {
+        delay: 3200,                 // lyh_需求②：3.2 秒
+        disableOnInteraction: false,  // lyh_需求②：手动后不停止
+      },
+      pagination: {
+        el: '#lyh_task1_pagination',
+        clickable: true,             // lyh_需求③：圆点可点
+      },
+    });
+  </script>
+</body>
+</html>
