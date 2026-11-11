@@ -342,6 +342,94 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!--  🎯 加分任务三 · 综合创作 + 技术答辩（超纲 ⭐⭐⭐）           -->
+  <!--  ① 第六件展品 爱达·魔都号  ✅ 已加入所有 Swiper              -->
+  <!--  ② 超纲能力 A: keyboard ← → 方向键翻页  ✅ 已加              -->
+  <!--  ③ 超纲能力 B: zoom 双击缩放  ← 本区块重点展示               -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="wy-sec" style="border:2px solid #ffd700;background:linear-gradient(135deg,#fffde7 0%,#fff8e1 100%);">
+    <div class="wy-sec-head" style="background:linear-gradient(90deg,#ff9800,#ff5722);">
+      <span class="wy-no">⭐</span>
+      <h2>任务三·综合创作 + 技术答辩 <small>超纲能力展示（keyboard + zoom）</small></h2>
+    </div>
+    <div class="wy-req" style="background:#fff3e0;border:1px dashed #ff9800;">
+      <h3 style="color:#e65100;">🎯 两件事</h3>
+      <p><b>①</b> 为光影展添加<b>第六件展品"爱达·魔都号"</b>（首艘国产大型邮轮，2024 年 1 月首航），AI 生成横版 16:9 图片 → ✅ 已完成（所有 Swiper 都已包含）</p>
+      <p><b>②</b> 挑一个课堂上没讲过的 Swiper 能力加上去 → 选了 <b>zoom 双击缩放</b> + <b>keyboard 方向键</b></p>
+      <h3 style="color:#e65100;margin-top:12px;">🎮 体验方式</h3>
+      <p>• <b>← →</b> 方向键：快速切换展品（keyboard 控制）</p>
+      <p>• <b>双击图片</b>：放大查看细节，再双击还原（zoom 缩放）</p>
+      <p>• <b>按住拖动 + 滚轮</b>：放大状态下平移查看</p>
+      <h3 style="color:#e65100;margin-top:12px;">📝 答辩四连问准备</h3>
+      <p style="font-size:13px;line-height:1.9;">
+        Q1 这段代码什么意思？→ zoom 模块让图片支持双击缩放，keyboard 模块让方向键控制翻页<br>
+        Q2 AI 第一次给的哪里不对？→ 忘了加 <code>swiper-zoom-container</code> 包裹层，zoom 不生效<br>
+        Q3 你改了什么？→ 在每张 slide 的 img 外层套了 <code>&lt;div class="swiper-zoom-container"&gt;</code><br>
+        Q4 新参数的作用？→ <code>zoom: true</code> 开启缩放；<code>keyboard: { enabled: true }</code> 开启键盘
+      </p>
+    </div>
+
+    <!-- lyh_任务三·zoom 双击缩放演示 -->
+    <div class="wy-demo">
+      <span class="wy-demo-tag">🔍 演示五 · 双击缩放查看大国重器细节（超纲 zoom + keyboard）</span>
+      <!-- lyh_zoom: slide 需要 overflow:hidden，图片用 swiper-zoom-container 包裹 -->
+      <div class="wy-swiper">
+        <!-- lyh_任务三：zoom Swiper 容器，自定义深色背景让图片更突出 -->
+        <div class="swiper" id="lyh_zoom_swiper" style="--swiper-navigation-color:#fff;--swiper-pagination-color:#fff;background:#1a1a2e;border-radius:10px;overflow:hidden;">
+          <div class="swiper-wrapper">
+            <!-- lyh_zoom: 每张 slide 内用 swiper-zoom-container 包裹 img，这是 Swiper zoom 模块的硬性要求 -->
+            <div class="swiper-slide" style="overflow:hidden;">
+              <div class="swiper-zoom-container">
+                <img src="swiper-imgs/tiangong_1.jpg" alt="天宫空间站" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div class="wy-cap"><h3>🛰️ 天宫空间站</h3><p>双击放大看太阳能帆板细节</p></div>
+            </div>
+            <div class="swiper-slide" style="overflow:hidden;">
+              <div class="swiper-zoom-container">
+                <img src="swiper-imgs/fuxing_1.jpg" alt="复兴号" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div class="wy-cap"><h3>🚄 复兴号动车组</h3><p>350 km/h · 双击看车头流线</p></div>
+            </div>
+            <div class="swiper-slide" style="overflow:hidden;">
+              <div class="swiper-zoom-container">
+                <img src="swiper-imgs/c919_1.jpg" alt="C919" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div class="wy-cap"><h3>✈️ C919 大飞机</h3><p>2023 商业首航 · 双击看机翼</p></div>
+            </div>
+            <div class="swiper-slide" style="overflow:hidden;">
+              <div class="swiper-zoom-container">
+                <img src="swiper-imgs/fendouzhe_1.jpg" alt="奋斗者号" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div class="wy-cap"><h3>🔱 奋斗者号</h3><p>10909 米 · 双击看潜器外壳</p></div>
+            </div>
+            <div class="swiper-slide" style="overflow:hidden;">
+              <div class="swiper-zoom-container">
+                <img src="swiper-imgs/fast_1.jpg" alt="FAST" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div class="wy-cap"><h3>🔭 中国天眼 FAST</h3><p>500 米口径 · 双击看索网结构</p></div>
+            </div>
+            <!-- lyh_任务三·核心：新增第六件展品 爱达·魔都号，AI 生成横版 16:9 -->
+            <div class="swiper-slide" style="overflow:hidden;">
+              <div class="swiper-zoom-container">
+                <img src="swiper-imgs/aida_modu.jpg" alt="爱达·魔都号" style="width:100%;height:100%;object-fit:cover;">
+              </div>
+              <div class="wy-cap"><h3>🚢 爱达·魔都号</h3><p>2024 年 1 月首航 · 首艘国产大型邮轮</p></div>
+            </div>
+          </div>
+          <!-- lyh_zoom: zoom 演示也配上 navigation + pagination，体验更完整 -->
+          <div class="swiper-button-next" id="lyh_zoom_next"></div>
+          <div class="swiper-button-prev" id="lyh_zoom_prev"></div>
+          <div class="swiper-pagination" id="lyh_zoom_pag"></div>
+        </div>
+      </div>
+      <p style="margin-top:10px;color:#666;font-size:13px;line-height:1.8;">
+        💡 <b>操作指南：</b>聚焦这个区域后，按 <code style="background:#eee;padding:0 5px;border-radius:3px;">←</code> <code style="background:#eee;padding:0 5px;border-radius:3px;">→</code> 切换展品；
+        <b>双击图片</b>放大，查看爱达·魔都号的船身细节或天宫的太阳能帆板；放大后可<b>拖动平移</b>；<b>再次双击</b>或按 <code style="background:#eee;padding:0 5px;border-radius:3px;">Esc</code> 还原。
+      </p>
+    </div>
+  </div>
+
   <div class="wy-back"><a href="index.html">← 返回课堂实践中心</a>　<a href="swiper-lesson.html">查看教师讲解版 →</a></div>
 
   <footer>Swiper 课堂操作任务 · 大国重器光影展（学生版） · 高级网页设计 · 2026-2027-1</footer>
@@ -490,6 +578,38 @@
     },
     pagination: {
       el: '#lyh_task1_pag',
+      clickable: true,
+    },
+  });
+
+  // ══════════════════════════════════════════════════════════
+  //  🎯 加分任务三·超纲能力展示：zoom 双击缩放 + keyboard
+  // ══════════════════════════════════════════════════════════
+  // lyh_zoom: Swiper zoom 模块需要两个条件——
+  //   1) HTML 里每张 slide 的 img 外层必须有 <div class="swiper-zoom-container"> 包裹
+  //   2) JS 配置里写 zoom: true 即可开启双击缩放
+  // lyh_keyboard: keyboard: { enabled: true } 让 ← → 方向键控制翻页（课堂没讲过的超纲参数）
+  var lyh_zoom_swiper = new Swiper("#lyh_zoom_swiper", {
+    loop: true,
+    speed: 600,
+    // lyh_zoom: 开启双击缩放模块（Swiper 内置，无需额外引入 JS）
+    zoom: {
+      maxRatio: 3,       // lyh_zoom: 最大放大 3 倍（默认 3，可改 2/4/5）
+      minRatio: 1,       // lyh_zoom: 最小回到 1 倍（原始大小）
+      toggle: true,      // lyh_zoom: 双击切换缩放（默认 true）
+    },
+    // lyh_keyboard: 课堂没讲过的参数，开启 ← → ↑ ↓ 方向键翻页
+    keyboard: {
+      enabled: true,
+      onlyInViewport: false,  // lyh_keyboard: 即使 swiper 不在可视区域也能响应（方便截图演示）
+    },
+    // lyh_t3_nav: 配上左右箭头 + 圆点，体验完整
+    navigation: {
+      nextEl: "#lyh_zoom_next",
+      prevEl: "#lyh_zoom_prev",
+    },
+    pagination: {
+      el: "#lyh_zoom_pag",
       clickable: true,
     },
   });
