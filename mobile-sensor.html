@@ -1,510 +1,298 @@
 <!--
-  lyh_mobile-sensor.html — 任务四·摇一摇彩蛋：手机上能真切感受到
+  lyh_mobile-sensor.html — 任务四·摇一摇彩蛋
   作者：林奕含  学号：24002120622
   时间：2026-11-18  模型：Trae
-  功能：devicemotion 加速度传感器 → 阈值触发 → 震动反馈 → 强烈视觉动画 → 随机菜谱弹出
-        ✅ navigator.vibrate() 让手机真震
-        ✅ 强烈视觉抖动 + 红色闪烁背景
-        ✅ Canvas 实时加速度波形图
-        ✅ 启动自检明确显示传感器是否工作
-        ✅ 兼容 HTTPS 安全上下文 + HTTP 降级
-        ✅ iOS 权限请求 + 不支持降级按钮
+  功能：devicemotion → accelerationIncludingGravity 合成加速度 → 阈值触发摇一摇 → 弹出随机菜谱
+        ✅ 验收①：冷却 1.5s，一次摇动只触发一次
+        ✅ 验收②：无传感器 → 显示"当前设备不支持"，降级按钮
+        ✅ 验收③：iOS 通过按钮申请权限
+        ✅ 验收④：代码注释讲清两种 acceleration 的区别
   命名约定：所有 CSS 类 / HTML id / JS 变量函数 均以 lyh_ 开头
+  为什么必须做降级？
+    答：不同手机/浏览器对 DeviceMotion API 支持差异大。
+    1) iOS 13+ 必须用户手动点按钮申请权限，否则 devicemotion 永远不触发；
+    2) iOS 某些版本即使授权了，从桌面快捷方式打开的 PWA 也读不到传感器；
+    3) Android 某些国产浏览器（微信内置浏览器、部分定制版 Chrome）可能禁用或屏蔽加速度传感器；
+    4) 如果服务器是 HTTP 而非 HTTPS，iOS Safari 会**静默屏蔽** devicemotion 事件，页面不报任何错但数据永远是 null；
+    5) 还有些设备根本没有加速度计（老 iPad、部分台式机浏览器模拟移动端）。
+    所以必须做降级——检测不到传感器时自动换成手动点击，保证任何设备都能玩。
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>任务四 · 摇一摇彩蛋 | 手机能感受到震！</title>
+  <title>任务四 · 摇一摇彩蛋</title>
   <style>
     * { -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
     html, body {
       margin: 0; padding: 0; height: 100%;
       font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      color: #fff; overflow: hidden;
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      overflow: hidden; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #fff;
     }
 
-    /* lyh_摇动时背景闪红（强烈视觉反馈） */
-    body.lyh-shaking-bg {
-      animation: lyh_bgShake .4s ease;
-    }
-    @keyframes lyh_bgShake {
-      0%,100% { background: linear-gradient(180deg, #1a1a2e, #16213e, #0f3460); }
-      30% { background: linear-gradient(180deg, #ff416c, #ff4b2b, #ff6b35); }
-      70% { background: linear-gradient(180deg, #ff416c, #ff4b2b, #ff6b35); }
-    }
+    /* lyh_标题区 */
+    .lyh-title { text-align: center; margin-bottom: 30px; }
+    .lyh-title h1 { font-size: 26px; margin: 0 0 6px; }
+    .lyh-title p { margin: 0; font-size: 14px; opacity: .85; }
 
-    .lyh-header { text-align: center; padding: 18px 16px 8px; }
-    .lyh-header h1 { font-size: 22px; margin: 0 0 4px; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
-    .lyh-header p { margin: 0; font-size: 13px; opacity: .8; }
-
-    .lyh-shake-area {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; width: 100%;
-    }
-
-    /* lyh_大图标 → 紫色手机造型（替换原来的 📱 emoji） */
+    /* lyh_摇一摇大图标（纯 CSS 动画） */
     .lyh-shake-icon {
-      font-size: 0;  /* lyh_隐藏原 emoji */
-      width: 160px; height: 240px;
-      animation: lyh_pulse 2s ease-in-out infinite;
-      cursor: pointer;
-      transition: transform .15s;
-      filter: drop-shadow(0 12px 28px rgba(0,0,0,.45));
-      position: relative;
+      font-size: 120px; line-height: 1;
+      animation: lyh_float 2.5s ease-in-out infinite;
+      filter: drop-shadow(0 10px 24px rgba(0,0,0,.35));
     }
-    .lyh-shake-icon svg { width: 100%; height: 100%; display: block; }
-    .lyh-shake-icon:active { transform: scale(0.92); }
-    @keyframes lyh_pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-    body.lyh-shaking-bg .lyh-shake-icon {
-      animation: lyh_hardShake .35s ease;
-    }
-    @keyframes lyh_hardShake {
-      0%,100%{transform:translate(0) rotate(0)}
-      10%{transform:translate(-20px,-10px) rotate(-10deg) scale(1.15)}
-      20%{transform:translate(20px,10px) rotate(10deg) scale(1.15)}
-      30%{transform:translate(-18px,8px) rotate(-8deg) scale(1.1)}
-      40%{transform:translate(18px,-8px) rotate(8deg) scale(1.1)}
-      50%{transform:translate(-15px,-5px) rotate(-6deg)}
-      60%{transform:translate(15px,5px) rotate(6deg)}
-      70%{transform:translate(-10px,0) rotate(-4deg)}
-      80%{transform:translate(10px,0) rotate(4deg)}
-      90%{transform:translate(-5px,0) rotate(-2deg)}
+    @keyframes lyh_float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .lyh-shaking .lyh-shake-icon { animation: lyh_shake .35s ease; }
+    @keyframes lyh_shake {
+      0%,100%{transform:translate(0,0) rotate(0)}
+      20%{transform:translate(-14px,0) rotate(-8deg)}
+      40%{transform:translate(14px,0) rotate(8deg)}
+      60%{transform:translate(-10px,0) rotate(-5deg)}
+      80%{transform:translate(10px,0) rotate(5deg)}
     }
 
-    /* lyh_状态条 */
+    /* lyh_状态提示 */
     .lyh-status {
-      margin-top: 18px; padding: 10px 20px;
-      background: rgba(255,255,255,.15); backdrop-filter: blur(6px);
-      border-radius: 24px; font-size: 14px;
-      border: 1px solid rgba(255,255,255,.2);
+      margin-top: 22px; padding: 10px 24px;
+      background: rgba(255,255,255,.2); backdrop-filter: blur(6px);
+      border-radius: 24px; font-size: 14px; text-align: center;
     }
-    .lyh-status.cooldown { background: rgba(255,152,0,.85); color: #fff; }
-    .lyh-status.ok { background: rgba(76,175,80,.85); color: #fff; }
-    .lyh-status.error { background: rgba(244,67,54,.85); color: #fff; }
-
-    /* lyh_自检状态面板（启动时显示传感器是否工作） */
-    .lyh-selfcheck {
-      margin-top: 12px; padding: 10px 14px;
-      background: rgba(255,255,255,.08); border-radius: 12px;
-      font-size: 12px; line-height: 1.8; width: 80%; max-width: 320px;
-      border: 1px solid rgba(255,255,255,.15);
-    }
-    .lyh-selfcheck .lyh-row { display: flex; justify-content: space-between; }
-    .lyh-selfcheck .lyh-ok { color: #66ff66; }
-    .lyh-selfcheck .lyh-no { color: #ff6b6b; }
-    .lyh-selfcheck .lyh-wait { color: #ffcc66; }
+    .lyh-status.ok { background: rgba(76,175,80,.85); }
+    .lyh-status.err { background: rgba(244,67,54,.85); }
 
     /* lyh_降级按钮 */
-    .lyh-fallback-btn {
-      margin-top: 14px; padding: 12px 28px; font-size: 15px; font-weight: 600;
-      background: linear-gradient(90deg, #ff416c, #ff4b2b);
-      color: #fff; border: none; border-radius: 28px;
-      box-shadow: 0 4px 20px rgba(255,65,108,.4);
-      display: none; cursor: pointer;
+    .lyh-btn {
+      margin-top: 16px; padding: 12px 32px; font-size: 15px; font-weight: 600;
+      background: #fff; color: #764ba2;
+      border: none; border-radius: 28px; cursor: pointer;
+      display: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,.25);
     }
-    .lyh-fallback-btn.show { display: inline-block; }
+    .lyh-btn.show { display: inline-block; }
+    .lyh-btn:active { transform: scale(.96); }
 
-    /* lyh_实时波形图 canvas */
-    .lyh-wave-wrap {
-      margin-top: 10px; width: 85%; max-width: 340px;
-      height: 70px; background: rgba(0,0,0,.4);
-      border-radius: 10px; overflow: hidden;
-      border: 1px solid rgba(255,255,255,.15);
-    }
-    .lyh-wave-wrap canvas { display: block; width: 100%; height: 100%; }
-
-    /* lyh_触发时震动脉冲环 */
-    .lyh-pulse-ring {
-      position: absolute; top: 50%; left: 50%;
-      width: 180px; height: 180px;
-      margin: -90px 0 0 -90px;
-      border: 4px solid #ff416c; border-radius: 50%;
-      opacity: 0; pointer-events: none;
-    }
-    body.lyh-shaking-bg .lyh-pulse-ring {
-      animation: lyh_pulseRing .5s ease-out;
-    }
-    @keyframes lyh_pulseRing {
-      0% { opacity: 1; transform: scale(0.3); }
-      100% { opacity: 0; transform: scale(2.2); }
-    }
-
-    /* lyh_结果卡片弹出 */
-    .lyh-result-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.65);
+    /* lyh_结果弹窗 */
+    .lyh-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5);
       display: none; align-items: center; justify-content: center; z-index: 200;
     }
-    .lyh-result-overlay.show { display: flex; animation: lyh_fadeIn .25s ease; }
-    @keyframes lyh_fadeIn { from{opacity:0} to{opacity:1} }
+    .lyh-overlay.show { display: flex; animation: lyh_fade .25s; }
+    @keyframes lyh_fade { from{opacity:0} to{opacity:1} }
 
-    .lyh-result-card {
-      width: 82vw; max-width: 360px; background: #fff; border-radius: 22px; overflow: hidden;
-      transform: scale(0.6); opacity: 0;
+    .lyh-card {
+      width: 80vw; max-width: 360px; background: #fff; border-radius: 20px; overflow: hidden;
+      color: #333;
+      transform: scale(.6); opacity: 0;
       animation: lyh_pop .45s cubic-bezier(.34,1.56,.64,1) forwards;
       box-shadow: 0 24px 60px rgba(0,0,0,.45);
-      color: #333;
     }
     @keyframes lyh_pop { to{transform:scale(1);opacity:1} }
-    .lyh-result-card img { width: 100%; height: 210px; object-fit: cover; display: block; }
-    .lyh-result-body { padding: 16px 20px 22px; text-align: center; }
-    .lyh-result-body h2 { margin: 0 0 6px; font-size: 21px; color: #222; }
-    .lyh-result-body p { margin: 0; font-size: 13px; color: #666; line-height: 1.7; }
-    .lyh-result-body button {
-      margin-top: 16px; padding: 10px 28px; font-size: 14px; font-weight: 600;
-      background: linear-gradient(90deg, #ff416c, #ff4b2b);
-      color: #fff; border: none; border-radius: 18px; cursor: pointer;
-      box-shadow: 0 4px 14px rgba(255,65,108,.35);
+    .lyh-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .lyh-card-body { padding: 16px 20px 20px; text-align: center; }
+    .lyh-card-body h2 { margin: 0 0 6px; font-size: 20px; }
+    .lyh-card-body p { margin: 0; font-size: 13px; color: #666; line-height: 1.6; }
+    .lyh-card-body button {
+      margin-top: 14px; padding: 8px 24px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      color: #fff; border: none; border-radius: 16px; font-size: 14px; cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <div class="lyh-header">
+  <div class="lyh-title">
     <h1>🎰 摇一摇抽今日菜谱</h1>
-    <p>真·摇一摇 — 手机震起来！</p>
+    <p>摇一摇手机，抽一道美食！</p>
   </div>
 
-  <div class="lyh-shake-area" id="lyh_shakeArea" style="position:relative;">
-    <div class="lyh-pulse-ring"></div>
-    <!-- lyh_紫色手机造型 + 九宫格彩色方块（替换原 📱 emoji） -->
-    <div class="lyh-shake-icon" id="lyh_shakeIcon" aria-label="摇一摇手机">
-      <svg viewBox="0 0 160 240" xmlns="http://www.w3.org/2000/svg">
-        <!-- lyh_手机外壳（紫色圆角矩形） -->
-        <rect x="6" y="6" width="148" height="228" rx="22" ry="22"
-              fill="url(#lyhPhoneGrad)" stroke="#fff" stroke-width="2"/>
-        <!-- lyh_屏幕内边 -->
-        <rect x="14" y="20" width="132" height="200" rx="8" ry="8"
-              fill="#1a1a2e" opacity=".2"/>
-        <!-- lyh_顶部听筒条 -->
-        <rect x="60" y="11" width="40" height="6" rx="3" ry="3" fill="#333"/>
-        <!-- lyh_九宫格彩色方块 3×3（橙/蓝/黄 循环，同截图） -->
-        <!-- 第一行 -->
-        <rect x="28"  y="42" width="32" height="32" rx="7" fill="#ff8c42"/>
-        <rect x="64"  y="42" width="32" height="32" rx="7" fill="#4fc3f7"/>
-        <rect x="100" y="42" width="32" height="32" rx="7" fill="#ffd54f"/>
-        <!-- 第二行 -->
-        <rect x="28"  y="82" width="32" height="32" rx="7" fill="#4fc3f7"/>
-        <rect x="64"  y="82" width="32" height="32" rx="7" fill="#ffd54f"/>
-        <rect x="100" y="82" width="32" height="32" rx="7" fill="#ff8c42"/>
-        <!-- 第三行 -->
-        <rect x="28"  y="122" width="32" height="32" rx="7" fill="#ff8c42"/>
-        <rect x="64"  y="122" width="32" height="32" rx="7" fill="#4fc3f7"/>
-        <rect x="100" y="122" width="32" height="32" rx="7" fill="#ffd54f"/>
-        <!-- lyh_渐变定义 -->
-        <defs>
-          <linearGradient id="lyhPhoneGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%"  stop-color="#7c4dff"/>
-            <stop offset="100%" stop-color="#512da8"/>
-          </linearGradient>
-        </defs>
-        <!-- lyh_手机底部 Home 条 -->
-        <rect x="55" y="215" width="50" height="5" rx="2.5" ry="2.5"
-              fill="#fff" opacity=".5"/>
-      </svg>
-    </div>
-    <div class="lyh-status" id="lyh_status">🔍 正在检测传感器...</div>
-    <button class="lyh-fallback-btn" id="lyh_fallbackBtn">🔄 点我抽菜谱（手机震一下）</button>
-
-    <!-- lyh_自检面板 -->
-    <div class="lyh-selfcheck" id="lyh_selfcheck">
-      <div class="lyh-row"><span>📡 DeviceMotion API</span><span id="lyh_self_api" class="lyh-wait">检测中...</span></div>
-      <div class="lyh-row"><span>🌐 HTTPS 安全上下文</span><span id="lyh_self_https" class="lyh-wait">检测中...</span></div>
-      <div class="lyh-row"><span>📊 实时加速度</span><span id="lyh_self_mag" class="lyh-wait">等待数据...</span></div>
-      <div class="lyh-row"><span>📳 震动 API</span><span id="lyh_self_vib" class="lyh-wait">检测中...</span></div>
-    </div>
-
-    <!-- lyh_波形图 -->
-    <div class="lyh-wave-wrap"><canvas id="lyh_wave"></canvas></div>
+  <div class="lyh-shake-area" id="lyh_shakeArea">
+    <div class="lyh-shake-icon" id="lyh_icon">📱</div>
   </div>
 
-  <div class="lyh-result-overlay" id="lyh_overlay">
-    <div class="lyh-result-card">
-      <img id="lyh_resultImg" src="" alt="今日菜谱" />
-      <div class="lyh-result-body">
-        <h2 id="lyh_resultName">—</h2>
-        <p id="lyh_resultDesc">—</p>
-        <button onclick="lyh_closeResult()">好嘞，就吃这个！</button>
+  <div class="lyh-status" id="lyh_status">🔍 正在检测传感器...</div>
+  <button class="lyh-btn" id="lyh_btn">🔄 点我抽一次</button>
+
+  <div class="lyh-overlay" id="lyh_overlay">
+    <div class="lyh-card">
+      <img id="lyh_img" src="" alt="" />
+      <div class="lyh-card-body">
+        <h2 id="lyh_name">—</h2>
+        <p id="lyh_desc">—</p>
+        <button onclick="lyh_close()">好嘞，就吃这个！</button>
       </div>
     </div>
   </div>
 
 <script>
   // ══════════════════════════════════════════════════════════
-  //  lyh_摇一摇彩蛋 — 手机上能真切感受到震！
-  //  技术要点：
-  //    1) devicemotion → accelerationIncludingGravity（含重力，兼容性最好）
-  //    2) 合成加速度 mag = sqrt(x²+y²+z²)
-  //    3) navigator.vibrate() 让手机真震（视觉+触觉双重反馈）
-  //    4) 强烈视觉反馈：背景闪红 + 图标剧烈抖动 + 脉冲环扩散
-  //    5) Canvas 实时波形图：手机上能看到加速度数值波动
-  //    6) 启动自检：明确告诉用户传感器状态
-  //    7) 兼容 HTTP（会警告）+ HTTPS（安全上下文）
+  //  lyh_摇一摇彩蛋核心逻辑（严格按截图要求实现）
   // ══════════════════════════════════════════════════════════
 
-  // lyh_菜谱数据库（6 道 AI 美食图）
+  // lyh_菜谱数据（6 道菜 + AI 生成美食图）
   var LYH_MENUS = [
-    { name: '🍲 番茄鸡蛋面', desc: '快手早餐首选，酸甜开胃，10 分钟搞定。', img: 'mobile-imgs/tomato_egg_noodle.jpg' },
-    { name: '🍛 红烧肉盖饭',   desc: '肥而不腻，入口即化，一顿两碗没问题。', img: 'mobile-imgs/dongpo_pork.jpg' },
-    { name: '🍜 兰州牛肉面',   desc: '一清二白三红四绿五黄，地道西北味。',     img: 'mobile-imgs/lanzhou_noodle.jpg' },
+    { name: '🍲 番茄鸡蛋面',  desc: '快手早餐首选，酸甜开胃，10 分钟搞定。', img: 'mobile-imgs/tomato_egg_noodle.jpg' },
+    { name: '🍛 红烧肉盖饭',  desc: '肥而不腻，入口即化，一顿两碗没问题。',   img: 'mobile-imgs/dongpo_pork.jpg' },
+    { name: '🍜 兰州牛肉面',  desc: '一清二白三红四绿五黄，地道西北味。',       img: 'mobile-imgs/lanzhou_noodle.jpg' },
     { name: '🌶️ 麻婆豆腐盖饭', desc: '麻辣鲜香，嫩滑入味，配米饭绝了。',      img: 'mobile-imgs/mapo_tofu.jpg' },
-    { name: '🐟 清蒸鲈鱼饭',   desc: '肉质细嫩，蒸鱼豉油一滴鲜过一滴。',      img: 'mobile-imgs/steamed_bass.jpg' },
+    { name: '🐟 清蒸鲈鱼饭',  desc: '肉质细嫩，蒸鱼豉油一滴鲜过一滴。',        img: 'mobile-imgs/steamed_bass.jpg' },
     { name: '🦆 北京烤鸭套餐', desc: '皮脆肉嫩，卷荷叶饼蘸甜面酱，国宴级。',   img: 'mobile-imgs/beijing_duck.jpg' },
   ];
 
-  var lyh_status = document.getElementById('lyh_status');
-  var lyh_shakeArea = document.getElementById('lyh_shakeArea');
-  var lyh_fallbackBtn = document.getElementById('lyh_fallbackBtn');
-  var lyh_overlay = document.getElementById('lyh_overlay');
-  var body = document.body;
-
-  // lyh_可调参数
-  var LYH_THRESHOLD = 10;    // lyh_加速度阈值（约 1g，最灵敏）
-  var LYH_COOLDOWN = 1200;  // lyh_冷却时间 ms
+  // lyh_变量（严格按截图：阈值约 18，冷却 1.5s）
+  var LYH_THRESHOLD = 18;      // lyh_阈值：合成加速度 > 18 判定为摇动（约 1.8g）
+  var LYH_COOLDOWN = 1500;    // lyh_冷却：1.5 秒内不重复触发
   var lyh_isCooling = false;
 
-  // lyh_波形图数据缓冲
-  var lyh_waveData = [];
-  var LYH_WAVE_SIZE = 80;
+  var lyh_status = document.getElementById('lyh_status');
+  var lyh_btn = document.getElementById('lyh_btn');
+  var lyh_icon = document.getElementById('lyh_icon');
+  var lyh_shakeArea = document.getElementById('lyh_shakeArea');
 
   // ══════════════════════════════════════════════════════════
-  //  lyh_0. 启动自检面板
+  //  lyh_验收②：降级处理 —— 当前设备不支持 → 显示手动按钮
   // ══════════════════════════════════════════════════════════
-  function lyh_runSelfCheck() {
-    // API 检测
-    var apiOk = 'DeviceMotionEvent' in window;
-    document.getElementById('lyh_self_api').textContent = apiOk ? '✅ 支持' : '❌ 不支持';
-    document.getElementById('lyh_self_api').className = apiOk ? 'lyh-ok' : 'lyh-no';
-
-    // HTTPS 检测
-    var isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-    document.getElementById('lyh_self_https').textContent = isSecure ? '✅ 是' : '⚠️ 非 HTTPS（传感器可能被屏蔽）';
-    document.getElementById('lyh_self_https').className = isSecure ? 'lyh-ok' : 'lyh-no';
-
-    // 震动 API
-    var vibOk = 'vibrate' in navigator;
-    document.getElementById('lyh_self_vib').textContent = vibOk ? '✅ 支持' : '❌ 不支持（iOS 不支持震动 API）';
-    document.getElementById('lyh_self_vib').className = vibOk ? 'lyh-ok' : 'lyh-no';
+  function lyh_fallback() {
+    lyh_status.textContent = '⚠️ 当前设备不支持加速度传感器，请用手机打开';
+    lyh_status.className = 'lyh-status err';
+    lyh_btn.textContent = '🔄 点我抽一次';
+    lyh_btn.classList.add('show');
+    lyh_btn.onclick = lyh_shakeTrigger;
   }
-  lyh_runSelfCheck();
 
   // ══════════════════════════════════════════════════════════
-  //  lyh_1. 初始化：检测环境 + 申请权限 + 启动监听
+  //  lyh_1. 检测 DeviceMotion API 是否存在
   // ══════════════════════════════════════════════════════════
-  function lyh_init() {
-    if (!('DeviceMotionEvent' in window)) {
-      lyh_fallback('❌ 当前设备不支持加速度传感器');
-      return;
-    }
-    // lyh_iOS 13+ 需手动请求权限（必须在点击事件中调用）
+  if (!('DeviceMotionEvent' in window)) {
+    lyh_fallback();
+  } else {
+    // lyh_验收③：iOS 13+ 必须通过按钮申请权限（不能自动弹）
     if (typeof DeviceMotionEvent.requestPermission === 'function') {
-      lyh_status.textContent = '📲 iOS 需要授权 — 点下方按钮开启';
-      lyh_status.classList.remove('ok', 'error', 'cooldown');
-      lyh_fallbackBtn.textContent = '🔑 开启传感器授权';
-      lyh_fallbackBtn.classList.add('show');
-      lyh_fallbackBtn.onclick = function () {
+      lyh_status.textContent = '📲 iOS 需要授权，请点下方按钮开启传感器';
+      lyh_status.className = 'lyh-status';
+      lyh_btn.textContent = '🔑 开启传感器授权';
+      lyh_btn.classList.add('show');
+      lyh_btn.onclick = function () {
         DeviceMotionEvent.requestPermission().then(function (res) {
           if (res === 'granted') {
-            lyh_fallbackBtn.classList.remove('show');
-            lyh_status.textContent = '✅ 授权成功！现在猛摇手机吧！';
-            lyh_status.classList.add('ok');
-            lyh_startListening();
+            lyh_btn.classList.remove('show');
+            lyh_status.textContent = '✅ 授权成功，摇一摇手机抽菜谱！';
+            lyh_status.className = 'lyh-status ok';
+            lyh_startListen();
           } else {
-            lyh_fallback('❌ 授权被拒绝 — 降级为手动点击');
+            lyh_fallback();
           }
-        }).catch(function () {
-          lyh_fallback('⚠️ 授权失败 — 降级为手动点击');
-        });
+        }).catch(function () { lyh_fallback(); });
       };
-      return;  // lyh_等用户点了再继续
+    } else {
+      // lyh_Android / 其他浏览器 → 直接启动监听
+      lyh_status.textContent = '✅ 传感器就绪，摇一摇手机抽菜谱！';
+      lyh_status.className = 'lyh-status ok';
+      lyh_startListen();
     }
-    // lyh_非 iOS → 直接启动
-    lyh_status.textContent = '✅ 传感器就绪 — 猛摇手机抽菜谱！';
-    lyh_status.classList.add('ok');
-    lyh_startListening();
   }
 
   // ══════════════════════════════════════════════════════════
-  //  lyh_2. 核心：devicemotion 监听 + 波形图 + 震动 + 视觉反馈
+  //  lyh_2. 监听 devicemotion — 验收④：取 accelerationIncludingGravity
   // ══════════════════════════════════════════════════════════
-  function lyh_startListening() {
-    var lyh_receivedData = false;
-    var magEl = document.getElementById('lyh_self_mag');
-
-    // lyh_初始化波形图
-    lyh_initWave();
+  // ⚠️ accelerationIncludingGravity vs acceleration 的区别（答辩用）：
+  //   accelerationIncludingGravity → **含重力加速度** (9.8 m/s²)
+  //     手机静止平放时，z 轴 ≈ -9.8，合成 mag ≈ 9.8
+  //     好处：无论手机怎么放，静止值稳定在 ~9.8，摇动时 mag > 18 明显区分
+  //
+  //   acceleration → **去除重力后的真实运动加速度**
+  //     手机静止时 mag ≈ 0（理想状态）
+  //     问题：不是所有设备都支持此字段（部分旧 Android / iOS 版本缺失）
+  //
+  //   选择 accelerationIncludingGravity 的原因：
+  //     1) 兼容性更好（所有支持 DeviceMotion 的设备都有此字段）
+  //     2) 阈值 18 远大于静止时的 ~9.8，能清晰区分"静止"和"摇动"
+  function lyh_startListen() {
+    var lyh_gotData = false;
 
     window.addEventListener('devicemotion', function (e) {
+      // lyh_优先取 accelerationIncludingGravity，兼容旧设备再回退 acceleration
       var acc = e.accelerationIncludingGravity || e.acceleration;
-      if (!acc) return;
+      if (!acc) return;  // lyh_两种都没有 → 这条事件没用
 
-      lyh_receivedData = true;
-      var mag = Math.sqrt((acc.x||0)**2 + (acc.y||0)**2 + (acc.z||0)**2);
+      lyh_gotData = true;
 
-      // lyh_更新自检面板实时数值
-      if (magEl) {
-        magEl.textContent = mag.toFixed(1) + 'g';
-        magEl.className = mag > LYH_THRESHOLD ? 'lyh-ok' : 'lyh-wait';
-      }
+      // lyh_合成加速度：mag = sqrt(x² + y² + z²)
+      var mag = Math.sqrt(
+        (acc.x || 0) * (acc.x || 0) +
+        (acc.y || 0) * (acc.y || 0) +
+        (acc.z || 0) * (acc.z || 0)
+      );
 
-      // lyh_画波形
-      lyh_drawWave(mag);
-
-      // lyh_触发摇动
+      // lyh_验收①：超过阈值 + 不在冷却中 → 触发（保证一次摇动只触发一次）
       if (!lyh_isCooling && mag > LYH_THRESHOLD) {
-        lyh_onShake();
+        lyh_shakeTrigger();
       }
     });
 
-    // lyh_3 秒超时：HTTP 环境下传感器可能被静默屏蔽
+    // lyh_3 秒内没收到任何数据 → HTTP 环境被静默屏蔽了 → 降级
     setTimeout(function () {
-      if (!lyh_receivedData) {
-        lyh_fallback(
-          '⚠️ 3 秒未收到传感器数据' +
-          (location.protocol !== 'https:' ? ' — 很可能是 HTTP 非安全上下文被屏蔽' : '') +
-          '<br>请用 HTTPS 链接打开，或点下方按钮'
-        );
-      }
+      if (!lyh_gotData) lyh_fallback();
     }, 3000);
 
-    // lyh_双保险：点图标也能触发（且带震动）
-    var icon = document.getElementById('lyh_shakeIcon');
-    icon.style.cursor = 'pointer';
-    icon.addEventListener('click', function () {
-      if (!lyh_isCooling) {
-        lyh_vibrate([80, 40, 80]);  // lyh_点一下也震！
-        lyh_onShake();
-      }
-    });
+    // lyh_图标也能点（手机上直接点图标也能玩）
+    lyh_icon.style.cursor = 'pointer';
+    lyh_icon.addEventListener('click', lyh_shakeTrigger);
   }
 
   // ══════════════════════════════════════════════════════════
-  //  lyh_3. 核心：触发摇动 — 让手机真震 + 视觉闪红
+  //  lyh_3. 触发摇一摇（有冷却）
   // ══════════════════════════════════════════════════════════
-  function lyh_onShake() {
+  function lyh_shakeTrigger() {
+    if (lyh_isCooling) return;
+
+    // lyh_触觉反馈：如果设备支持震动 API（iOS 不支持也不会报错）
+    if ('vibrate' in navigator) {
+      try { navigator.vibrate([80, 50, 80]); } catch (e) {}
+    }
+
+    // lyh_视觉反馈：图标剧烈抖动
+    lyh_shakeArea.classList.add('lyh-shaking');
+    lyh_status.textContent = '🎲 摇动中！抽取今日菜谱...';
+    lyh_status.className = 'lyh-status';
+
+    // lyh_验收①：触发后进入 1.5 秒冷却
     lyh_isCooling = true;
 
-    // lyh_① 让手机真震（触觉反馈！）
-    lyh_vibrate([100, 50, 100, 50, 150]);  // 震动模式：震-停-震-停-长震
-
-    // lyh_② 强烈视觉反馈：背景闪红 + 图标剧烈抖动 + 脉冲环
-    body.classList.add('lyh-shaking-bg');
-    lyh_status.textContent = '🎲 摇动中！抽取今日菜谱...';
-    lyh_status.classList.remove('ok');
-    lyh_status.classList.add('cooldown');
-
-    // lyh_③ 400ms 后弹出菜谱（等震动/动画走完）
+    // lyh_0.4 秒后弹出菜谱动画
     setTimeout(function () {
-      body.classList.remove('lyh-shaking-bg');
-      lyh_pickRandom();
+      lyh_shakeArea.classList.remove('lyh-shaking');
+      lyh_pick();
     }, 400);
 
-    // lyh_④ 冷却结束
+    // lyh_冷却结束后解锁
     setTimeout(function () {
       lyh_isCooling = false;
-      lyh_status.classList.remove('cooldown');
-      lyh_status.classList.add('ok');
-      lyh_status.textContent = '✅ 再摇一次抽新菜谱！';
+      lyh_status.textContent = '✅ 摇一摇手机抽新菜谱！';
+      lyh_status.className = 'lyh-status ok';
     }, LYH_COOLDOWN);
   }
 
-  // lyh_震动封装：安卓有效，iOS navigator.vibrate 不存在会自动跳过
-  function lyh_vibrate(pattern) {
-    if ('vibrate' in navigator) {
-      try { navigator.vibrate(pattern); } catch (e) {}
-    }
-    // lyh_iOS 没有震动 API，但 Safari 会忽略这行不报错
+  // ══════════════════════════════════════════════════════════
+  //  lyh_4. 随机抽一道菜 + 弹出动画
+  // ══════════════════════════════════════════════════════════
+  function lyh_pick() {
+    var m = LYH_MENUS[Math.floor(Math.random() * LYH_MENUS.length)];
+    document.getElementById('lyh_img').src = m.img;
+    document.getElementById('lyh_name').textContent = m.name;
+    document.getElementById('lyh_desc').textContent = m.desc;
+    document.getElementById('lyh_overlay').classList.add('show');
   }
 
-  // ══════════════════════════════════════════════════════════
-  //  lyh_4. Canvas 实时波形图
-  // ══════════════════════════════════════════════════════════
-  var lyh_waveCanvas, lyh_waveCtx, lyh_waveW = 0, lyh_waveH = 0;
-  function lyh_initWave() {
-    lyh_waveCanvas = document.getElementById('lyh_wave');
-    if (!lyh_waveCanvas) return;
-    lyh_waveCtx = lyh_waveCanvas.getContext('2d');
-    var wrap = lyh_waveCanvas.parentElement;
-    lyh_waveW = wrap.clientWidth;
-    lyh_waveH = wrap.clientHeight;
-    lyh_waveCanvas.width = lyh_waveW;
-    lyh_waveCanvas.height = lyh_waveH;
-    // lyh_定时清空数据（如果没传感器数据就画一条静止线）
-    setInterval(function () { lyh_drawWave(9.8); }, 200);
+  function lyh_close() {
+    document.getElementById('lyh_overlay').classList.remove('show');
   }
-  function lyh_drawWave(mag) {
-    if (!lyh_waveCtx) return;
-    lyh_waveData.push(mag);
-    if (lyh_waveData.length > LYH_WAVE_SIZE) lyh_waveData.shift();
-
-    var ctx = lyh_waveCtx, w = lyh_waveW, h = lyh_waveH;
-    ctx.clearRect(0, 0, w, h);
-
-    // lyh_画阈值线
-    var thrY = h * 0.3;
-    ctx.strokeStyle = 'rgba(255,107,107,.5)';
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath(); ctx.moveTo(0, thrY); ctx.lineTo(w, thrY); ctx.stroke();
-    ctx.setLineDash([]);
-
-    // lyh_画波形
-    var maxVal = 25;  // lyh_y 轴最大值
-    var step = w / LYH_WAVE_SIZE;
-    ctx.beginPath();
-    ctx.lineWidth = 2;
-    for (var i = 0; i < lyh_waveData.length; i++) {
-      var val = Math.min(lyh_waveData[i], maxVal);
-      var y = h - (val / maxVal) * h * 0.9 - 2;
-      var x = i * step;
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    }
-    // lyh_渐变颜色：低于阈值绿色，高于红色
-    var lastVal = lyh_waveData[lyh_waveData.length - 1] || 0;
-    var grad = ctx.createLinearGradient(0, 0, w, 0);
-    if (lastVal > LYH_THRESHOLD) {
-      grad.addColorStop(0, '#ff416c'); grad.addColorStop(1, '#ff4b2b');
-    } else {
-      grad.addColorStop(0, '#66ff66'); grad.addColorStop(1, '#4fc3f7');
-    }
-    ctx.strokeStyle = grad;
-    ctx.stroke();
-  }
-
-  // ══════════════════════════════════════════════════════════
-  //  lyh_5. 降级处理
-  // ══════════════════════════════════════════════════════════
-  function lyh_fallback(msg) {
-    lyh_status.innerHTML = msg;
-    lyh_status.classList.remove('ok', 'cooldown');
-    lyh_status.classList.add('error');
-    lyh_fallbackBtn.textContent = '🔄 点我抽菜谱（手机震一下）';
-    lyh_fallbackBtn.classList.add('show');
-    lyh_fallbackBtn.onclick = function () {
-      lyh_vibrate([80, 40, 120]);  // lyh_降级按钮也带震动！
-      lyh_pickRandom();
-    };
-  }
-
-  // ══════════════════════════════════════════════════════════
-  //  lyh_6. 抽菜谱 + 弹出
-  // ══════════════════════════════════════════════════════════
-  function lyh_pickRandom() {
-    var idx = Math.floor(Math.random() * LYH_MENUS.length);
-    var m = LYH_MENUS[idx];
-    document.getElementById('lyh_resultImg').src = m.img;
-    document.getElementById('lyh_resultName').textContent = m.name;
-    document.getElementById('lyh_resultDesc').textContent = m.desc;
-    lyh_overlay.classList.add('show');
-  }
-  function lyh_closeResult() { lyh_overlay.classList.remove('show'); }
-  lyh_overlay.addEventListener('click', function (e) {
-    if (e.target === lyh_overlay) lyh_closeResult();
+  document.getElementById('lyh_overlay').addEventListener('click', function (e) {
+    if (e.target === this) lyh_close();
   });
-
-  // lyh_启动
-  lyh_init();
 </script>
 </body>
 </html>
