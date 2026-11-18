@@ -45,14 +45,17 @@
       align-items: center; justify-content: center; width: 100%;
     }
 
-    /* lyh_大图标 + 呼吸动画 + 摇动时剧烈抖动 */
+    /* lyh_大图标 → 紫色手机造型（替换原来的 📱 emoji） */
     .lyh-shake-icon {
-      font-size: 160px; line-height: 1;
+      font-size: 0;  /* lyh_隐藏原 emoji */
+      width: 160px; height: 240px;
       animation: lyh_pulse 2s ease-in-out infinite;
-      filter: drop-shadow(0 10px 28px rgba(0,0,0,.4));
       cursor: pointer;
       transition: transform .15s;
+      filter: drop-shadow(0 12px 28px rgba(0,0,0,.45));
+      position: relative;
     }
+    .lyh-shake-icon svg { width: 100%; height: 100%; display: block; }
     .lyh-shake-icon:active { transform: scale(0.92); }
     @keyframes lyh_pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
     body.lyh-shaking-bg .lyh-shake-icon {
@@ -166,7 +169,42 @@
 
   <div class="lyh-shake-area" id="lyh_shakeArea" style="position:relative;">
     <div class="lyh-pulse-ring"></div>
-    <div class="lyh-shake-icon" id="lyh_shakeIcon">📱</div>
+    <!-- lyh_紫色手机造型 + 九宫格彩色方块（替换原 📱 emoji） -->
+    <div class="lyh-shake-icon" id="lyh_shakeIcon" aria-label="摇一摇手机">
+      <svg viewBox="0 0 160 240" xmlns="http://www.w3.org/2000/svg">
+        <!-- lyh_手机外壳（紫色圆角矩形） -->
+        <rect x="6" y="6" width="148" height="228" rx="22" ry="22"
+              fill="url(#lyhPhoneGrad)" stroke="#fff" stroke-width="2"/>
+        <!-- lyh_屏幕内边 -->
+        <rect x="14" y="20" width="132" height="200" rx="8" ry="8"
+              fill="#1a1a2e" opacity=".2"/>
+        <!-- lyh_顶部听筒条 -->
+        <rect x="60" y="11" width="40" height="6" rx="3" ry="3" fill="#333"/>
+        <!-- lyh_九宫格彩色方块 3×3（橙/蓝/黄 循环，同截图） -->
+        <!-- 第一行 -->
+        <rect x="28"  y="42" width="32" height="32" rx="7" fill="#ff8c42"/>
+        <rect x="64"  y="42" width="32" height="32" rx="7" fill="#4fc3f7"/>
+        <rect x="100" y="42" width="32" height="32" rx="7" fill="#ffd54f"/>
+        <!-- 第二行 -->
+        <rect x="28"  y="82" width="32" height="32" rx="7" fill="#4fc3f7"/>
+        <rect x="64"  y="82" width="32" height="32" rx="7" fill="#ffd54f"/>
+        <rect x="100" y="82" width="32" height="32" rx="7" fill="#ff8c42"/>
+        <!-- 第三行 -->
+        <rect x="28"  y="122" width="32" height="32" rx="7" fill="#ff8c42"/>
+        <rect x="64"  y="122" width="32" height="32" rx="7" fill="#4fc3f7"/>
+        <rect x="100" y="122" width="32" height="32" rx="7" fill="#ffd54f"/>
+        <!-- lyh_渐变定义 -->
+        <defs>
+          <linearGradient id="lyhPhoneGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%"  stop-color="#7c4dff"/>
+            <stop offset="100%" stop-color="#512da8"/>
+          </linearGradient>
+        </defs>
+        <!-- lyh_手机底部 Home 条 -->
+        <rect x="55" y="215" width="50" height="5" rx="2.5" ry="2.5"
+              fill="#fff" opacity=".5"/>
+      </svg>
+    </div>
     <div class="lyh-status" id="lyh_status">🔍 正在检测传感器...</div>
     <button class="lyh-fallback-btn" id="lyh_fallbackBtn">🔄 点我抽菜谱（手机震一下）</button>
 
