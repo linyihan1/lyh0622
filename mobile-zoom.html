@@ -57,7 +57,10 @@
 
   <div class="lyh-topbar">
     <span class="lyh-title">🔍 双指缩放查看器</span>
-    <span class="lyh-scale-text" id="lyh_scaleText">1.0x</span>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span class="lyh-scale-text" id="lyh_scaleText">1.0x</span>
+      <span class="lyh-scale-text" id="lyh_rotText" title="旋转角度">0°</span>
+    </div>
   </div>
 
   <div class="lyh-viewer" id="lyh_viewer">
@@ -84,17 +87,20 @@
   var lyh_img = document.getElementById('lyh_img');
   var lyh_scaleText = document.getElementById('lyh_scaleText');
 
-  // lyh_核心状态
-  var lyh_state = { scale: 1, tx: 0, ty: 0, width: 0, height: 0 };
-  var LYH_MIN = 1, LYH_MAX = 4;
+  // lyh_核心状态（rot 旋转角度 单位度，加分项）
+  var lyh_state = { scale: 1, tx: 0, ty: 0, rot: 0, width: 0, height: 0 };
+  var LYH_MIN = 1, LYH_MAX = 4, LYH_ROT_MAX = 45;
 
   // lyh_交互临时变量
   var lyh_mode = 'none';
   var lyh_lastDist = 0, lyh_startDist = 0;
   var lyh_startPinchScale = 1;
   var lyh_startMidX = 0, lyh_startMidY = 0;
+  var lyh_startAngle = 0;           // lyh_加分项：双指旋转初始角度
+  var lyh_startPinchRot = 0;        // lyh_加分项：双指旋转起始 state.rot
   var lyh_lastTouchX = 0, lyh_lastTouchY = 0;
   var lyh_lastTapTime = 0;
+  var LYH_STORAGE_KEY = 'lyh_zoom_state_v1';  // lyh_验收④：状态持久化 key
 
   // lyh_初始化
   lyh_img.addEventListener('load', lyh_init);
@@ -107,18 +113,52 @@
     lyh_img.style.height = (lyh_img.naturalHeight * ratio) + 'px';
     lyh_state.width = lyh_img.clientWidth;
     lyh_state.height = lyh_img.clientHeight;
+    // lyh_验收④：尝试从 localStorage 恢复之前的状态（旋转屏幕不丢失）
+    lyh_restoreState();
     lyh_applyTransform();
   }
 
-  // lyh_把 state 渲染到 transform
+  // lyh_验收④：保存/恢复 — 旋转屏幕不丢失
+  function lyh_saveState() {
+    try {
+      localStorage.setItem(LYH_STORAGE_KEY, JSON.stringify({
+        scale: lyh_state.scale, tx: lyh_state.tx, ty: lyh_state.ty, rot: lyh_state.rot
+      }));
+    } catch (e) {}
+  }
+  function lyh_restoreState() {
+    try {
+      var raw = localStorage.getItem(LYH_STORAGE_KEY);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      if (s.scale >= LYH_MIN && s.scale <= LYH_MAX) lyh_state.scale = s.scale;
+      if (typeof s.tx === 'number') lyh_state.tx = s.tx;
+      if (typeof s.ty === 'number') lyh_state.ty = s.ty;
+      if (typeof s.rot === 'number') lyh_state.rot = s.rot;
+    } catch (e) {}
+  }
+  // lyh_beforeunload / visibilitychange 时保存
+  window.addEventListener('beforeunload', lyh_saveState);
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') lyh_saveState();
+  });
+
+  // lyh_把 state 渲染到 transform（加分项：加入 rotate）
   function lyh_applyTransform() {
     var w = lyh_state.width * lyh_state.scale;
     var h = lyh_state.height * lyh_state.scale;
     var vw = lyh_viewer.clientWidth, vh = lyh_viewer.clientHeight;
     var baseX = (vw - w) / 2, baseY = (vh - h) / 2;
     var fx = baseX + lyh_state.tx, fy = baseY + lyh_state.ty;
-    lyh_img.style.transform = 'translate(' + fx + 'px,' + fy + 'px) scale(' + lyh_state.scale + ')';
+    // lyh_transform 顺序：先 translate → 再 rotate → 再 scale
+    lyh_img.style.transform =
+      'translate(' + fx + 'px,' + fy + 'px)' +
+      ' rotate(' + lyh_state.rot + 'deg)' +
+      ' scale(' + lyh_state.scale + ')';
     lyh_scaleText.textContent = lyh_state.scale.toFixed(1) + 'x';
+    // lyh_加分项：旋转指示器
+    var rotEl = document.getElementById('lyh_rotText');
+    if (rotEl) rotEl.textContent = Math.round(lyh_state.rot) + '°';
   }
 
   // lyh_边界限制：松手后
@@ -155,6 +195,9 @@
       lyh_startPinchScale = lyh_state.scale;
       lyh_startMidX = (t[0].clientX + t[1].clientX) / 2;
       lyh_startMidY = (t[0].clientY + t[1].clientY) / 2;
+      // lyh_加分项：双指旋转 → 用 Math.atan2 算两指连线角度
+      lyh_startAngle = Math.atan2(t[1].clientY - t[0].clientY, t[1].clientX - t[0].clientX);
+      lyh_startPinchRot = lyh_state.rot;
     }
   }
 
@@ -170,6 +213,11 @@
       var ratio = getDist(t[0], t[1]) / lyh_startDist;
       var newScale = Math.max(LYH_MIN, Math.min(LYH_MAX, lyh_startPinchScale * ratio));
       lyh_scaleAtPoint(newScale, lyh_startMidX, lyh_startMidY);
+      // lyh_加分项：双指旋转 → Math.atan2 算当前角度，减初始角度得差值
+      var curAngle = Math.atan2(t[1].clientY - t[0].clientY, t[1].clientX - t[0].clientX);
+      var angleDiff = (curAngle - lyh_startAngle) * 180 / Math.PI;  // rad → deg
+      lyh_state.rot = Math.max(-LYH_ROT_MAX, Math.min(LYH_ROT_MAX, lyh_startPinchRot + angleDiff));
+      lyh_applyTransform();
     }
   }
 
@@ -215,7 +263,7 @@
   function lyh_toggleDoubleTap() {
     lyh_img.style.transition = 'transform .25s ease';
     if (lyh_state.scale > 1.2) {
-      lyh_state.scale = 1; lyh_state.tx = 0; lyh_state.ty = 0;
+      lyh_state.scale = 1; lyh_state.tx = 0; lyh_state.ty = 0; lyh_state.rot = 0;
     } else {
       lyh_scaleAtPoint(2, lyh_viewer.clientWidth / 2, lyh_viewer.clientHeight / 2);
       lyh_clamp();
@@ -224,7 +272,11 @@
     setTimeout(function () { lyh_img.style.transition = ''; }, 260);
   }
 
-  window.addEventListener('resize', lyh_init);
+  // lyh_验收④：resize 时重新 layout，但保留 scale/tx/ty/rot（旋转屏幕后恢复状态）
+  window.addEventListener('resize', function () {
+    lyh_init();
+    lyh_clamp();
+  });
 </script>
 </body>
 </html>
