@@ -160,8 +160,8 @@
   var lyh_fallbackBtn = document.getElementById('lyh_fallbackBtn');
   var lyh_overlay = document.getElementById('lyh_overlay');
 
-  var LYH_THRESHOLD = 15;    // lyh_加速度阈值（约 1.5g，调灵敏了好触发）
-  var LYH_COOLDOWN = 1500;  // lyh_冷却 1.5s
+  var LYH_THRESHOLD = 10;    // lyh_加速度阈值（约 1g，已调最灵敏保证手机能摇出来）
+  var LYH_COOLDOWN = 1200;  // lyh_冷却 1.2s（也缩短了）
   var lyh_isCooling = false;
 
   // lyh_1. 检测环境 + 申请权限
@@ -207,21 +207,46 @@
     document.getElementById('lyh_threshVal').textContent = LYH_THRESHOLD;
     if (debug) debug.style.display = 'flex';
 
+    var lyh_receivedData = false;   // lyh_标记是否真的收到过传感器数据
+
     window.addEventListener('devicemotion', function (e) {
-      if (lyh_isCooling) return;
+      // lyh_两种加速度字段都试，谁非空用谁（兼容不同浏览器）
       var acc = e.accelerationIncludingGravity || e.acceleration;
-      if (!acc) { lyh_fallback('无法读取加速度数据'); return; }
+      if (!acc) return;
+
+      lyh_receivedData = true;
       var mag = Math.sqrt((acc.x||0)**2 + (acc.y||0)**2 + (acc.z||0)**2);
+
       // lyh_调试面板实时更新
       if (magVal) {
         magVal.textContent = mag.toFixed(1) + 'g';
         magVal.classList.toggle('hot', mag > LYH_THRESHOLD);
       }
+
+      if (lyh_isCooling) return;
       if (mag > LYH_THRESHOLD) lyh_onShake();
     });
-    // lyh_加分项：倾斜视差 — 手机左右/前后倾斜时 shake-icon 产生视差位移
+
+    // lyh_3 秒后还没收到任何数据 → 说明浏览器/设备真不支持，降级
+    setTimeout(function () {
+      if (!lyh_receivedData) {
+        lyh_fallback('⚠️ 传感器无数据，点下方按钮抽菜谱');
+      }
+    }, 3000);
+
+    // lyh_加分项：倾斜视差
     lyh_startParallax();
-    lyh_status.textContent = '📲 摇一摇，揭晓今日菜谱（还可以倾斜玩视差）';
+    lyh_status.textContent = '📲 摇一摇手机抽菜谱（阈值已调最灵敏）';
+
+    // lyh_双保险：点手机图标也能触发（某些浏览器传感器不工作时也能玩）
+    var icon = document.getElementById('lyh_shakeIcon');
+    if (icon) {
+      icon.style.cursor = 'pointer';
+      icon.title = '也可以点我触发';
+      icon.addEventListener('click', function () {
+        if (!lyh_isCooling) lyh_onShake();
+      });
+    }
   }
 
   // lyh_加分项：倾斜视差 — 监听 deviceorientation，让 shake-icon 跟随倾斜方向轻微偏移
