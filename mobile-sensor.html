@@ -87,6 +87,20 @@
       background: linear-gradient(90deg, #667eea, #764ba2);
       color: #fff; border: none; border-radius: 16px; font-size: 14px; cursor: pointer;
     }
+
+    /* lyh_调试面板：实时显示加速度数值（手机上能看到） */
+    .lyh-debug {
+      position: fixed; bottom: 8px; left: 8px; right: 8px; z-index: 80;
+      background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
+      border-radius: 10px; padding: 8px 12px;
+      font-size: 11px; color: #fff; font-family: Menlo, monospace;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .lyh-debug .mag-val {
+      font-size: 18px; font-weight: 700;
+      transition: color .1s;
+    }
+    .lyh-debug .mag-val.hot { color: #ff6b6b; }  /* lyh_超阈值时变红 */
   </style>
 </head>
 <body>
@@ -100,6 +114,13 @@
     <div class="lyh-shake-icon" id="lyh_shakeIcon">📱</div>
     <div class="lyh-status" id="lyh_status">📲 请在手机上摇一摇</div>
     <button class="lyh-fallback-btn" id="lyh_fallbackBtn">🔄 点我抽菜谱</button>
+  </div>
+
+  <!-- lyh_调试面板：实时加速度，手机上能看到数值变化 -->
+  <div class="lyh-debug" id="lyh_debug" style="display:none;">
+    <span>📊 实时加速度</span>
+    <span class="mag-val" id="lyh_magVal">—</span>
+    <span>阈值 <span id="lyh_threshVal">15</span></span>
   </div>
 
   <div class="lyh-result-overlay" id="lyh_overlay">
@@ -139,7 +160,7 @@
   var lyh_fallbackBtn = document.getElementById('lyh_fallbackBtn');
   var lyh_overlay = document.getElementById('lyh_overlay');
 
-  var LYH_THRESHOLD = 18;    // lyh_加速度阈值（约 1.8g）
+  var LYH_THRESHOLD = 15;    // lyh_加速度阈值（约 1.5g，调灵敏了好触发）
   var LYH_COOLDOWN = 1500;  // lyh_冷却 1.5s
   var lyh_isCooling = false;
 
@@ -180,11 +201,22 @@
   //   摇手机时剧烈晃动的合成加速度 (1.8g+) 比重力 (1g) 大得多，阈值 18 已经能把摇动和静止区分开
   //   而且某些旧设备不支持 acceleration 字段，用 IncludingGravity 兼容性更好
   function lyh_startListening() {
+    // lyh_显示调试面板（手机上能看到实时加速度）
+    var debug = document.getElementById('lyh_debug');
+    var magVal = document.getElementById('lyh_magVal');
+    document.getElementById('lyh_threshVal').textContent = LYH_THRESHOLD;
+    if (debug) debug.style.display = 'flex';
+
     window.addEventListener('devicemotion', function (e) {
       if (lyh_isCooling) return;
       var acc = e.accelerationIncludingGravity || e.acceleration;
       if (!acc) { lyh_fallback('无法读取加速度数据'); return; }
       var mag = Math.sqrt((acc.x||0)**2 + (acc.y||0)**2 + (acc.z||0)**2);
+      // lyh_调试面板实时更新
+      if (magVal) {
+        magVal.textContent = mag.toFixed(1) + 'g';
+        magVal.classList.toggle('hot', mag > LYH_THRESHOLD);
+      }
       if (mag > LYH_THRESHOLD) lyh_onShake();
     });
     // lyh_加分项：倾斜视差 — 手机左右/前后倾斜时 shake-icon 产生视差位移
