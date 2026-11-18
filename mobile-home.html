@@ -1,9 +1,8 @@
 <!--
-  lyh_mobile-home.html — 课堂成果统一入口（视频 + 三大移动端任务）
+  lyh_mobile-home.html — 单页统一入口（视频 + 手势 + 缩放 + 摇一摇）
   作者：林奕含  学号：24002120622
   时间：2026-11-18  模型：Trae
-  功能：① 内嵌 16:9 视频播放器  ② 三个移动端任务跳转卡片
-        手机打开一个链接全能玩：看视频 + 手势 + 缩放 + 摇一摇
+  功能：tab 切换 · 视频 / 手势卡片 / 图片查看器 / 摇一摇抽菜谱
   命名约定：所有 CSS 类 / HTML id / JS 变量函数 均以 lyh_ 开头
 -->
 <!DOCTYPE html>
@@ -18,128 +17,415 @@
       margin: 0; padding: 0; min-height: 100%;
       font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
       background: linear-gradient(160deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-      color: #fff;
+      color: #fff; -webkit-user-select: none; user-select: none;
     }
 
-    /* lyh_顶部标题区 */
-    .lyh-header { text-align: center; padding: 30px 20px 16px; }
-    .lyh-header h1 { font-size: 22px; margin: 0 0 6px; }
-    .lyh-header p { margin: 0; font-size: 13px; opacity: .85; }
-
-    /* lyh_视频区标题 */
-    .lyh-sec-title {
-      padding: 10px 20px 8px; font-size: 13px; font-weight: 700;
-      opacity: .95; letter-spacing: 1px; text-transform: uppercase;
-      display: flex; align-items: center; gap: 6px;
+    /* ═══════════════ lyh_顶部 tab 导航 ═══════════════ */
+    .lyh-tabs {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; background: rgba(0,0,0,.4); backdrop-filter: blur(10px);
+      padding: 6px 0; gap: 2px;
     }
-    .lyh-sec-title::before {
-      content: ''; display: inline-block; width: 4px; height: 14px;
-      background: #fff; border-radius: 2px;
+    .lyh-tab {
+      flex: 1; text-align: center; padding: 10px 4px;
+      font-size: 13px; color: rgba(255,255,255,.7);
+      border-radius: 8px; margin: 2px;
+      cursor: pointer; transition: all .2s;
     }
+    .lyh-tab.active {
+      background: rgba(255,255,255,.25);
+      color: #fff; font-weight: 700;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    }
+    .lyh-tab-icon { font-size: 18px; display: block; margin-bottom: 2px; }
 
-    /* lyh_视频容器：16:9 */
+    /* ═══════════════ lyh_面板容器 ═══════════════ */
+    .lyh-panel { display: none; padding: 16px; }
+    .lyh-panel.active { display: block; }
+    .lyh-panel-title {
+      font-size: 20px; font-weight: 700; text-align: center;
+      margin: 10px 0 4px;
+    }
+    .lyh-panel-desc { font-size: 12px; opacity: .8; text-align: center; margin-bottom: 14px; }
+
+    /* ═══════════════ lyh_Panel 1: 视频播放器 ═══════════════ */
     .lyh-video-wrap {
-      position: relative;
-      margin: 0 16px 20px;
-      padding-bottom: 56.25%; /* 16:9 */
+      position: relative; padding-bottom: 56.25%;
       background: #000; border-radius: 14px; overflow: hidden;
       box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      margin-top: 30px;
     }
     .lyh-video-wrap video {
       position: absolute; top: 0; left: 0;
       width: 100%; height: 100%; object-fit: contain;
       background: #000;
     }
+    .lyh-video-tip { text-align: center; font-size: 12px; opacity: .7; padding: 12px 0; }
 
-    /* lyh_卡片列表 */
-    .lyh-list { padding: 0 16px 40px; display: flex; flex-direction: column; gap: 14px; }
-
-    /* lyh_单个卡片 */
+    /* ═══════════════ lyh_Panel 2: 手势卡片 ═══════════════ */
+    .lyh-stage {
+      position: relative; margin: 10px auto;
+      width: 92%; max-width: 420px;
+      height: 58vh; min-height: 360px;
+      overflow: hidden; border-radius: 20px;
+      touch-action: pan-y;
+    }
     .lyh-card {
-      display: block; text-decoration: none; color: #fff;
-      background: rgba(255,255,255,.18); backdrop-filter: blur(10px);
-      border-radius: 18px; padding: 20px 18px;
-      border: 1px solid rgba(255,255,255,.25);
-      box-shadow: 0 6px 20px rgba(0,0,0,.15);
-      transition: transform .2s;
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      border-radius: 20px; overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0,0,0,.25);
+      background: #fff;
+      transition: transform .3s cubic-bezier(.25,.8,.25,1), opacity .3s;
+      will-change: transform, opacity; color: #333;
     }
-    .lyh-card:active { transform: scale(.97); }
+    .lyh-card img { width: 100%; height: 52%; object-fit: cover; display: block; }
+    .lyh-card-body { padding: 14px 16px 18px; color: #333; }
+    .lyh-card-body h2 { margin: 0 0 4px; font-size: 20px; color: #333; }
+    .lyh-card-body .lyh-tag {
+      display: inline-block; font-size: 11px; background: #ff6b35; color: #fff;
+      padding: 2px 8px; border-radius: 10px; margin-bottom: 6px;
+    }
+    .lyh-card-body p { margin: 0; font-size: 14px; color: #555; line-height: 1.6; }
+    .lyh-hint {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: rgba(0,0,0,.7); color: #fff; padding: 10px 20px; border-radius: 20px;
+      font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 50;
+    }
+    .lyh-hint.show { opacity: 1; }
+    .lyh-counter { text-align: center; font-size: 13px; padding: 8px 0; opacity: .9; }
 
-    .lyh-card-top {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+    /* ═══════════════ lyh_Panel 3: 图片查看器 ═══════════════ */
+    .lyh-zoom-box {
+      width: 92%; margin: 10px auto;
+      aspect-ratio: 3/4;
+      background: #000; border-radius: 16px; overflow: hidden;
+      touch-action: none; position: relative;
     }
-    .lyh-card-num {
-      font-size: 11px; font-weight: 700;
-      background: rgba(255,255,255,.3); padding: 3px 10px; border-radius: 10px;
-      letter-spacing: 1px;
+    .lyh-zoom-box img {
+      width: 100%; height: 100%; object-fit: contain;
+      background: #111; display: block;
+      transform-origin: 0 0;
+      transition: transform .1s;
     }
-    .lyh-card-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-    .lyh-card-desc { font-size: 12px; opacity: .85; line-height: 1.5; }
-    .lyh-card-arrow {
-      float: right; font-size: 16px; opacity: .8; margin-top: -22px;
+    .lyh-zoom-info {
+      text-align: center; font-size: 12px; padding: 8px; opacity: .8;
     }
 
-    /* lyh_三种主题色 */
-    .lyh-card.gesture { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-color: rgba(255,255,255,.3); }
-    .lyh-card.zoom    { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-color: rgba(255,255,255,.3); }
-    .lyh-card.shake   { background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); border-color: rgba(255,255,255,.3); }
-
-    .lyh-footer { text-align: center; padding: 10px 20px 30px; font-size: 11px; opacity: .6; }
+    /* ═══════════════ lyh_Panel 4: 摇一摇 ═══════════════ */
+    .lyh-shake-area {
+      text-align: center; padding: 30px 20px;
+    }
+    .lyh-phone-icon {
+      width: 100px; height: 160px; margin: 20px auto;
+      background: linear-gradient(135deg, #7c4dff, #512da8);
+      border-radius: 20px; position: relative;
+      box-shadow: 0 8px 30px rgba(124,77,255,.5);
+      animation: lyh_breath 2s ease-in-out infinite;
+    }
+    @keyframes lyh_breath {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    .lyh-phone-icon.shaking { animation: lyh_shake .4s; }
+    @keyframes lyh_shake {
+      0%{transform:translate(0,0) rotate(0)}
+      25%{transform:translate(-8px,2px) rotate(-8deg) scale(1.15)}
+      50%{transform:translate(8px,-2px) rotate(8deg) scale(1.1)}
+      75%{transform:translate(-6px,3px) rotate(-6deg) scale(1.05)}
+      100%{transform:translate(0,0) rotate(0)}
+    }
+    .lyh-phone-screen {
+      position: absolute; top: 20px; left: 10px; right: 10px; bottom: 30px;
+      background: #fff; border-radius: 6px;
+      display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; align-content: flex-start;
+    }
+    .lyh-phone-screen div { width: 28%; aspect-ratio: 1; border-radius: 3px; }
+    .lyh-phone-screen div:nth-child(3n+1){background:#ff8c42}
+    .lyh-phone-screen div:nth-child(3n+2){background:#4fc3f7}
+    .lyh-phone-screen div:nth-child(3n){background:#ffd54f}
+    .lyh-recipe-card {
+      display: none; margin: 16px auto; padding: 20px;
+      background: rgba(255,255,255,.2); backdrop-filter: blur(10px);
+      border-radius: 16px; max-width: 320px;
+    }
+    .lyh-recipe-card.show { display: block; animation: lyh_pop .4s ease-out; }
+    @keyframes lyh_pop { 0%{transform:scale(.5);opacity:0} 60%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+    .lyh-recipe-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; }
+    .lyh-recipe-card h3 { margin: 10px 0 4px; font-size: 20px; }
+    .lyh-recipe-card p { margin: 0; font-size: 13px; opacity: .9; }
+    .lyh-recipe-close {
+      margin-top: 12px; padding: 8px 20px; background: rgba(255,255,255,.3);
+      border: none; border-radius: 14px; color: #fff; font-size: 13px; cursor: pointer;
+    }
+    .lyh-debug {
+      position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,.65); color: #fff; padding: 8px 16px;
+      border-radius: 20px; font-size: 11px; z-index: 200; text-align: center;
+    }
+    .lyh-debug b { color: #ff6b6b; }
   </style>
 </head>
 <body>
 
-  <div class="lyh-header">
-    <h1>🎬 课堂成果 · 统一入口</h1>
-    <p>一个链接 · 视频 + 三大移动端任务</p>
+  <!-- ═══════════════ lyh_tab 导航 ═══════════════ -->
+  <div class="lyh-tabs">
+    <div class="lyh-tab active" data-tab="video"><span class="lyh-tab-icon">📹</span>视频</div>
+    <div class="lyh-tab" data-tab="gesture"><span class="lyh-tab-icon">🍜</span>手势</div>
+    <div class="lyh-tab" data-tab="zoom"><span class="lyh-tab-icon">🦆</span>缩放</div>
+    <div class="lyh-tab" data-tab="shake"><span class="lyh-tab-icon">🎰</span>摇一摇</div>
   </div>
 
-  <!-- lyh_视频区 -->
-  <div class="lyh-sec-title">课堂演示视频</div>
-  <div class="lyh-video-wrap">
-    <video controls autoplay muted loop playsinline preload="metadata">
-      <source src="video.mp4" type="video/mp4" />
-      您的浏览器不支持 video 标签
-    </video>
+  <!-- ═══════════════ lyh_Panel 1: 视频 ═══════════════ -->
+  <div class="lyh-panel active" id="lyh-panel-video">
+    <div class="lyh-panel-title">🎬 课堂演示视频</div>
+    <div class="lyh-panel-desc">自动播放 · 循环 · 静音（有控制条可开声音）</div>
+    <div class="lyh-video-wrap">
+      <video controls autoplay muted loop playsinline preload="metadata">
+        <source src="video.mp4" type="video/mp4" />
+      </video>
+    </div>
+    <div class="lyh-video-tip">视频播不出？确认服务器用 node lyh_server.js 启动（支持 Range 请求）</div>
   </div>
 
-  <!-- lyh_三大任务卡片区 -->
-  <div class="lyh-sec-title">移动端交互任务</div>
-  <div class="lyh-list">
-
-    <!-- 任务二：手势卡片 -->
-    <a class="lyh-card gesture" href="mobile-gesture.html">
-      <div class="lyh-card-top">
-        <span class="lyh-card-num">任务二 ★★</span>
-      </div>
-      <div class="lyh-card-title">🍜 中华美食卡片</div>
-      <div class="lyh-card-desc">左右滑动 4 道中华美食 · 阈值 60px · 300ms 冷却 · 边界提示</div>
-      <span class="lyh-card-arrow">→</span>
-    </a>
-
-    <!-- 任务三：图片查看器 -->
-    <a class="lyh-card zoom" href="mobile-zoom.html">
-      <div class="lyh-card-top">
-        <span class="lyh-card-num">任务三 ★★★</span>
-      </div>
-      <div class="lyh-card-title">🦆 美食图片查看器</div>
-      <div class="lyh-card-desc">双指 1~4x 缩放（两指中点不跳）· 双击 1x↔2x · 双指旋转 · 状态持久化</div>
-      <span class="lyh-card-arrow">→</span>
-    </a>
-
-    <!-- 任务四：摇一摇彩蛋 -->
-    <a class="lyh-card shake" href="mobile-sensor.html">
-      <div class="lyh-card-top">
-        <span class="lyh-card-num">任务四 ★★★</span>
-      </div>
-      <div class="lyh-card-title">🎰 摇一摇抽菜谱</div>
-      <div class="lyh-card-desc">devicemotion 加速度传感器 · 阈值 18 · 冷却 1.5s · iOS 权限 · 降级按钮</div>
-      <span class="lyh-card-arrow">→</span>
-    </a>
-
+  <!-- ═══════════════ lyh_Panel 2: 手势卡片 ═══════════════ -->
+  <div class="lyh-panel" id="lyh-panel-gesture">
+    <div class="lyh-panel-title">🍜 中华美食卡片</div>
+    <div class="lyh-panel-desc">← 左滑下一道 · 右滑上一道 → 阈值 60px · 冷却 300ms</div>
+    <div class="lyh-stage" id="lyh_stage">
+      <div class="lyh-hint" id="lyh_hint">已经是第一张啦</div>
+      <div class="lyh-card"><img src="mobile-imgs/beijing_duck.jpg"><div class="lyh-card-body"><span class="lyh-tag">京菜 · 招牌</span><h2>北京烤鸭</h2><p>皮脆肉嫩，配荷叶饼、甜面酱、葱丝黄瓜条。皮片 108 片，片片均匀。</p></div></div>
+      <div class="lyh-card"><img src="mobile-imgs/mapo_tofu.jpg"><div class="lyh-card-body"><span class="lyh-tag">川菜 · 麻辣</span><h2>麻婆豆腐</h2><p>麻辣鲜香嫩烫。嫩豆腐配郫县豆瓣酱、花椒粒、牛肉末，红油红亮，下饭神器。</p></div></div>
+      <div class="lyh-card"><img src="mobile-imgs/steamed_bass.jpg"><div class="lyh-card-body"><span class="lyh-tag">粤菜 · 清蒸</span><h2>清蒸鲈鱼</h2><p>整条鲈鱼清蒸，葱姜丝点缀，蒸鱼豉油提鲜。肉质细嫩，原汁原味。</p></div></div>
+      <div class="lyh-card"><img src="mobile-imgs/dongpo_pork.jpg"><div class="lyh-card-body"><span class="lyh-tag">浙菜 · 家常</span><h2>东坡肉</h2><p>方方正正一块肉，色泽红亮，肥而不腻。青花瓷盘装，配青菜点缀。</p></div></div>
+    </div>
+    <div class="lyh-counter" id="lyh_counter">第 1 / 4 张</div>
   </div>
 
-  <div class="lyh-footer">林奕含 · 24002120622</div>
+  <!-- ═══════════════ lyh_Panel 3: 图片查看器 ═══════════════ -->
+  <div class="lyh-panel" id="lyh-panel-zoom">
+    <div class="lyh-panel-title">🦆 美食图片查看器</div>
+    <div class="lyh-panel-desc">双指 1~4x 缩放（以两指中点为基准·不跳）· 双击 1x↔2x</div>
+    <div class="lyh-zoom-box" id="lyh_zoom_box">
+      <img id="lyh_zoom_img" src="mobile-imgs/beijing_duck.jpg" />
+    </div>
+    <div class="lyh-zoom-info" id="lyh_zoom_info">1.0x · 双击放大 / 双指缩放</div>
+  </div>
 
+  <!-- ═══════════════ lyh_Panel 4: 摇一摇 ═══════════════ -->
+  <div class="lyh-panel" id="lyh-panel-shake">
+    <div class="lyh-panel-title">🎰 摇一摇抽菜谱</div>
+    <div class="lyh-panel-desc">猛摇手机 · 阈值 18 · 冷却 1.5s · 传感器不支持自动降级</div>
+    <div class="lyh-shake-area">
+      <div class="lyh-phone-icon" id="lyh_phone">
+        <div class="lyh-phone-screen"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      </div>
+      <div style="font-size:13px; opacity:.85; margin-top:10px;">点一下手机图标也能抽 🎲</div>
+    </div>
+    <div class="lyh-recipe-card" id="lyh_recipe_card">
+      <img id="lyh_recipe_img" src="">
+      <h3 id="lyh_recipe_name"></h3>
+      <p id="lyh_recipe_desc"></p>
+      <button class="lyh-recipe-close" onclick="document.getElementById('lyh_recipe_card').classList.remove('show')">关闭</button>
+    </div>
+    <button style="display:none;margin:14px auto;padding:10px 22px;background:rgba(255,255,255,.25);border:none;border-radius:20px;color:#fff;font-size:14px" id="lyh_fallback_btn">🔄 点我抽一次</button>
+  </div>
+
+  <!-- ═══════════════ lyh_调试面板（摇一摇时显示） ═══════════════ -->
+  <div class="lyh-debug" id="lyh_debug" style="display:none">
+    📊 加速度 <b id="lyh_debug_val">9.8</b>g · 阈值 18 · <span id="lyh_debug_status">监听中</span>
+  </div>
+
+<script>
+  // ══════════════════════════════════════════════════════════
+  //  lyh_tab 切换
+  // ══════════════════════════════════════════════════════════
+  document.querySelectorAll('.lyh-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.lyh-tab').forEach(function(t){ t.classList.remove('active'); });
+      document.querySelectorAll('.lyh-panel').forEach(function(p){ p.classList.remove('active'); });
+      tab.classList.add('active');
+      document.getElementById('lyh-panel-' + tab.dataset.tab).classList.add('active');
+      // lyh_切换到摇一摇面板时显示调试面板
+      document.getElementById('lyh_debug').style.display = tab.dataset.tab === 'shake' ? 'block' : 'none';
+    });
+  });
+
+  // ══════════════════════════════════════════════════════════
+  //  lyh_Panel 2: 手势卡片
+  // ══════════════════════════════════════════════════════════
+  (function(){
+    var stage = document.getElementById('lyh_stage');
+    var cards = stage.querySelectorAll('.lyh-card');
+    var counter = document.getElementById('lyh_counter');
+    var hint = document.getElementById('lyh_hint');
+    var index = 0, total = cards.length, startX = 0, cooling = false;
+    var THRESHOLD = 60, COOLDOWN = 300;
+
+    function layout() {
+      for (var i = 0; i < total; i++) {
+        cards[i].style.transition = 'none';
+        if (i === index)       { cards[i].style.cssText += 'transform:translateX(0);opacity:1;z-index:10'; }
+        else if (i < index)    { cards[i].style.cssText += 'transform:translateX(-100%);opacity:0;z-index:1'; }
+        else                   { cards[i].style.cssText += 'transform:translateX(100%);opacity:0;z-index:1'; }
+      }
+      stage.offsetHeight;
+      counter.textContent = '第 ' + (index+1) + ' / ' + total + ' 张';
+    }
+    layout();
+
+    stage.addEventListener('touchstart', function(e){
+      if (cooling) return; startX = e.changedTouches[0].clientX; hint.classList.remove('show');
+    }, {passive:true});
+
+    stage.addEventListener('touchend', function(e){
+      if (cooling) return;
+      var dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) < THRESHOLD) return;
+      if (dx < 0) {
+        if (index >= total-1) { hint.textContent='已经是最后一张啦'; hint.classList.add('show'); setTimeout(function(){hint.classList.remove('show')},1500); return; }
+        index++;
+      } else {
+        if (index <= 0) { hint.textContent='已经是第一张啦'; hint.classList.add('show'); setTimeout(function(){hint.classList.remove('show')},1500); return; }
+        index--;
+      }
+      layout(); cooling = true; setTimeout(function(){cooling=false}, COOLDOWN);
+    }, {passive:true});
+  })();
+
+  // ══════════════════════════════════════════════════════════
+  //  lyh_Panel 3: 图片查看器（双指缩放 + 双击）
+  // ══════════════════════════════════════════════════════════
+  (function(){
+    var box = document.getElementById('lyh_zoom_box');
+    var img = document.getElementById('lyh_zoom_img');
+    var info = document.getElementById('lyh_zoom_info');
+    var state = { scale:1, tx:0, ty:0, startDist:0, startScale:1, anchorX:0, anchorY:0 };
+    var isDoubleTap = false, lastTap = 0;
+
+    function apply() {
+      img.style.transform = 'translate(' + state.tx + 'px,' + state.ty + 'px) scale(' + state.scale + ')';
+      info.textContent = state.scale.toFixed(1) + 'x · 双击切换';
+    }
+
+    function getDist(t) {
+      var dx = t[0].clientX - t[1].clientX;
+      var dy = t[0].clientY - t[1].clientY;
+      return Math.sqrt(dx*dx + dy*dy);
+    }
+
+    box.addEventListener('touchstart', function(e){
+      e.preventDefault();
+      if (e.touches.length === 2) {
+        state.startDist = getDist(e.touches);
+        state.startScale = state.scale;
+        var rect = box.getBoundingClientRect();
+        state.anchorX = (e.touches[0].clientX + e.touches[1].clientX)/2 - rect.left;
+        state.anchorY = (e.touches[0].clientY + e.touches[1].clientY)/2 - rect.top;
+      } else if (e.touches.length === 1) {
+        var now = Date.now();
+        if (now - lastTap < 300) {
+          // lyh_双击
+          state.scale = state.scale > 1.5 ? 1 : 2;
+          state.tx = 0; state.ty = 0; apply();
+        }
+        lastTap = now;
+      }
+    }, {passive:false});
+
+    box.addEventListener('touchmove', function(e){
+      e.preventDefault();
+      if (e.touches.length === 2) {
+        var d = getDist(e.touches);
+        var newScale = Math.max(1, Math.min(4, state.startScale * (d / state.startDist)));
+        state.scale = newScale;
+      }
+      apply();
+    }, {passive:false});
+
+    box.addEventListener('touchend', function(e){
+      e.preventDefault();
+      if (state.scale < 1.1) { state.scale = 1; state.tx = 0; state.ty = 0; }
+      apply();
+    }, {passive:false});
+
+    apply();
+  })();
+
+  // ══════════════════════════════════════════════════════════
+  //  lyh_Panel 4: 摇一摇抽菜谱
+  // ══════════════════════════════════════════════════════════
+  (function(){
+    var RECIPES = [
+      {name:'🍲 番茄鸡蛋面', img:'mobile-imgs/tomato_egg_noodle.jpg', desc:'红亮番茄汤 + 金黄鸡蛋块 + 青葱点缀，家常美味，10 分钟搞定。'},
+      {name:'🍜 兰州牛肉面', img:'mobile-imgs/lanzhou_noodle.jpg', desc:'一清二白三红四绿五黄，牛肉汤清，萝卜雪白，辣子通红，蒜苗翠绿。'},
+      {name:'🍜 麻婆豆腐盖饭', img:'mobile-imgs/mapo_tofu.jpg', desc:'嫩豆腐配麻辣红油，浇在热米饭上，一碗管饱，川菜经典。'},
+      {name:'🦆 北京烤鸭卷', img:'mobile-imgs/beijing_duck.jpg', desc:'荷叶饼卷烤鸭皮 + 甜面酱 + 黄瓜丝，皮脆肉嫩，京菜头牌。'},
+      {name:'🐟 清蒸鲈鱼', img:'mobile-imgs/steamed_bass.jpg', desc:'整条鲈鱼清蒸，葱姜丝 + 蒸鱼豉油，肉质细嫩，粤菜经典。'},
+      {name:'🥩 东坡肉', img:'mobile-imgs/dongpo_pork.jpg', desc:'方方正正红烧肉，色泽红亮，肥而不腻，浙菜招牌。'},
+    ];
+
+    var LYH_THRESHOLD = 18;
+    var LYH_COOLDOWN = 1500;
+    var lyh_isCooling = false;
+    var phone = document.getElementById('lyh_phone');
+    var card = document.getElementById('lyh_recipe_card');
+    var fallback = document.getElementById('lyh_fallback_btn');
+    var debugVal = document.getElementById('lyh_debug_val');
+    var debugStatus = document.getElementById('lyh_debug_status');
+    var supported = 'DeviceMotionEvent' in window;
+
+    function trigger() {
+      if (lyh_isCooling) return;
+      lyh_isCooling = true;
+      phone.classList.add('shaking');
+      navigator.vibrate && navigator.vibrate([100,50,100]);
+      setTimeout(function(){ phone.classList.remove('shaking'); }, 400);
+      setTimeout(function(){ lyh_isCooling = false; }, LYH_COOLDOWN);
+
+      // lyh_随机抽一道菜
+      var r = RECIPES[Math.floor(Math.random()*RECIPES.length)];
+      document.getElementById('lyh_recipe_img').src = r.img;
+      document.getElementById('lyh_recipe_name').textContent = r.name;
+      document.getElementById('lyh_recipe_desc').textContent = r.desc;
+      card.classList.add('show');
+    }
+
+    // lyh_点手机图标也能抽
+    phone.addEventListener('click', trigger);
+    fallback.addEventListener('click', trigger);
+
+    if (!supported) {
+      debugStatus.textContent = '设备不支持，点图标抽';
+      fallback.style.display = 'block';
+    } else {
+      debugStatus.textContent = '监听中';
+      // lyh_正式监听 devicemotion
+      window.addEventListener('devicemotion', function(e){
+        var acc = e.accelerationIncludingGravity || e.acceleration || {};
+        var mag = Math.sqrt((acc.x||0)**2 + (acc.y||0)**2 + (acc.z||0)**2);
+        debugVal.textContent = mag.toFixed(1);
+        debugVal.style.color = mag >= LYH_THRESHOLD ? '#ff6b6b' : '#fff';
+        if (mag >= LYH_THRESHOLD) trigger();
+      });
+    }
+
+    // lyh_iOS 权限请求按钮
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+      var btn = document.createElement('button');
+      btn.textContent = '🔑 开启传感器授权';
+      btn.style.cssText = 'margin:10px auto;padding:10px 24px;background:rgba(255,255,255,.3);border:none;border-radius:20px;color:#fff;font-size:14px;display:block';
+      btn.onclick = function(){
+        DeviceMotionEvent.requestPermission().then(function(r){
+          if (r === 'granted') { btn.style.display = 'none'; debugStatus.textContent = '权限已获取 · 监听中'; }
+        });
+      };
+      // lyh_只在 iOS Safari 显示
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        document.querySelector('#lyh-panel-shake .lyh-shake-area').appendChild(btn);
+      }
+    }
+  })();
+</script>
 </body>
 </html>
