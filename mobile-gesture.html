@@ -1,0 +1,266 @@
+<!--
+  lyh_mobile-gesture.html — 任务二·手势卡片：左右滑动切换内容
+  作者：林奕含  学号：24002120622
+  时间：2026-11-18  模型：Trae
+  功能：中华美食卡片 4 道菜，touch 手势左右滑动切换，300ms 冷却，边界提示
+  命名约定：所有 CSS 类 / HTML id / JS 变量函数 均以 lyh_ 开头
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>任务二 · 手势卡片 | 中华美食</title>
+  <style>
+    /* lyh_全局：防止手势选择文字 / 长按菜单，保证滑动体验纯净 */
+    * { -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(160deg, #ffecd2 0%, #fcb69f 50%, #ff9a9e 100%);
+      overflow: hidden;
+    }
+
+    /* lyh_页面标题区 */
+    .lyh-header {
+      text-align: center; padding: 18px 16px 6px;
+    }
+    .lyh-header h1 {
+      font-size: 22px; margin: 0; color: #7a3b1e;
+      text-shadow: 0 1px 2px rgba(255,255,255,.6);
+    }
+    .lyh-header p {
+      margin: 4px 0 0; font-size: 13px; color: #a0522d;
+    }
+
+    /* lyh_卡片舞台：固定高度，overflow 隐藏非激活卡片 */
+    .lyh-stage {
+      position: relative;
+      margin: 14px auto;
+      width: 92vw; max-width: 420px;
+      height: 58vh; min-height: 360px;
+      overflow: hidden;
+      /* lyh_touch-action: pan-y 保证纵向还能滚动页面 */
+      touch-action: pan-y;
+    }
+
+    /* lyh_单张卡片：绝对定位叠在一起，left 控制位置 */
+    .lyh-card {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0,0,0,.25);
+      background: #fff;
+      /* lyh_transition: 300ms 过渡动画（截图要求） */
+      transition: transform .3s cubic-bezier(.25,.8,.25,1), opacity .3s;
+      will-change: transform, opacity;
+    }
+    .lyh-card img {
+      width: 100%; height: 52%; object-fit: cover; display: block;
+    }
+    .lyh-card-body {
+      padding: 14px 16px 18px;
+    }
+    .lyh-card-body h2 {
+      margin: 0 0 4px; font-size: 20px; color: #333;
+    }
+    .lyh-card-body .lyh-tag {
+      display: inline-block; font-size: 11px;
+      background: #ff6b35; color: #fff;
+      padding: 2px 8px; border-radius: 10px; margin-bottom: 6px;
+    }
+    .lyh-card-body p {
+      margin: 0; font-size: 14px; color: #555; line-height: 1.6;
+    }
+
+    /* lyh_边界提示（第一张/最后一张） */
+    .lyh-hint {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,.55); color: #fff;
+      padding: 10px 20px; border-radius: 20px;
+      font-size: 14px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s;
+      z-index: 50;
+    }
+    .lyh-hint.show { opacity: 1; }
+
+    /* lyh_计数器 "第 X / 4 张" */
+    .lyh-counter {
+      text-align: center; font-size: 13px; color: #7a3b1e;
+      padding: 4px 0 12px; font-weight: 600;
+    }
+
+    /* lyh_底部操作提示 */
+    .lyh-tip {
+      text-align: center; font-size: 12px; color: #a0522d;
+      position: fixed; bottom: 12px; width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="lyh-header">
+    <h1>🍜 中华美食卡片</h1>
+    <p>← 左滑看下一道　右滑看上一道 →</p>
+  </div>
+
+  <!-- lyh_卡片舞台 -->
+  <div class="lyh-stage" id="lyh_stage">
+
+    <!-- lyh_边界提示：第一张 / 最后一张 -->
+    <div class="lyh-hint" id="lyh_hint">已经是第一张啦</div>
+
+    <!-- lyh_4 张美食卡片，初始全部叠在 left:0 -->
+    <!-- lyh_data: 菜名 / 图片 / 简介 -->
+    <div class="lyh-card" data-lyh-index="0">
+      <!-- lyh_图片用 AI 生成的 placeholder -->
+      <img src="swiper-imgs/fuxing_1.jpg" alt="北京烤鸭" />
+      <div class="lyh-card-body">
+        <span class="lyh-tag">京菜 · 招牌</span>
+        <h2>北京烤鸭</h2>
+        <p>皮脆肉嫩，肥而不腻。蘸甜面酱、卷荷叶饼，是老北京最负盛名的国宴级大菜。</p>
+      </div>
+    </div>
+
+    <div class="lyh-card" data-lyh-index="1">
+      <img src="swiper-imgs/c919_1.jpg" alt="麻婆豆腐" />
+      <div class="lyh-card-body">
+        <span class="lyh-tag">川菜 · 经典</span>
+        <h2>麻婆豆腐</h2>
+        <p>麻辣鲜香，嫩滑入味。一勺花椒、一勺豆瓣酱，平凡豆腐炒出江湖气。</p>
+      </div>
+    </div>
+
+    <div class="lyh-card" data-lyh-index="2">
+      <img src="swiper-imgs/fendouzhe_1.jpg" alt="清蒸鲈鱼" />
+      <div class="lyh-card-body">
+        <span class="lyh-tag">粤菜 · 鲜品</span>
+        <h2>清蒸鲈鱼</h2>
+        <p>火候精准到秒，肉质细嫩如凝脂。淋上蒸鱼豉油，一滴鲜过一滴。</p>
+      </div>
+    </div>
+
+    <div class="lyh-card" data-lyh-index="3">
+      <img src="swiper-imgs/tiangong_1.jpg" alt="东坡肉" />
+      <div class="lyh-card-body">
+        <span class="lyh-tag">浙菜 · 人文</span>
+        <h2>东坡肉</h2>
+        <p>慢炖三时，入口即化。苏东坡被贬黄州时的发明，肥瘦相间，甜咸适中。</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- lyh_底部：第 X / 4 张 -->
+  <div class="lyh-counter" id="lyh_counter">第 1 / 4 张</div>
+
+  <div class="lyh-tip">📱 在手机上打开体验最佳</div>
+
+<script>
+  // ══════════════════════════════════════════════════════════
+  //  lyh_手势卡片核心逻辑
+  //  lyh_关键变量：
+  //    lyh_stage       — 舞台容器
+  //    lyh_cards       — 4 张卡片 NodeList
+  //    lyh_index       — 当前激活卡片索引（0~3）
+  //    lyh_startX      — 触摸起始 X 坐标
+  //    lyh_cooling     — 冷却锁（300ms 内不响应第二次）
+  // ══════════════════════════════════════════════════════════
+
+  var lyh_stage = document.getElementById('lyh_stage');
+  var lyh_cards = lyh_stage.querySelectorAll('.lyh-card');
+  var lyh_counter = document.getElementById('lyh_counter');
+  var lyh_hint = document.getElementById('lyh_hint');
+
+  var lyh_index = 0;          // 当前卡片
+  var lyh_total = lyh_cards.length;  // 4
+  var lyh_startX = 0;         // 触摸起始点
+  var lyh_cooling = false;    // 冷却锁
+  var LYH_THRESHOLD = 60;     // lyh_阈值：滑动距离超过 60px 才算切换
+  var LYH_COOLDOWN = 300;     // lyh_冷却时间：300ms 防快速连滑
+
+  // lyh_初始化：第 0 张在最上层、位置为 0，其余右侧 100% 等待进场
+  function lyh_layout() {
+    for (var i = 0; i < lyh_total; i++) {
+      var card = lyh_cards[i];
+      card.style.transition = 'none';  // lyh_关闭过渡，瞬设初始位置
+      if (i === lyh_index) {
+        card.style.transform = 'translateX(0)';
+        card.style.opacity = '1';
+        card.style.zIndex = '10';
+      } else if (i < lyh_index) {
+        // lyh_已经"翻过去"的旧卡片：放到左侧 -100%
+        card.style.transform = 'translateX(-100%)';
+        card.style.opacity = '0';
+        card.style.zIndex = '1';
+      } else {
+        // lyh_还没进场的新卡片：放到右侧 100%
+        card.style.transform = 'translateX(100%)';
+        card.style.opacity = '0';
+        card.style.zIndex = '1';
+      }
+    }
+    // lyh_强制 reflow 让上面的 transition:none 生效
+    lyh_stage.offsetHeight;
+    // lyh_恢复过渡动画
+    for (var j = 0; j < lyh_total; j++) {
+      lyh_cards[j].style.transition = '';
+    }
+    lyh_counter.textContent = '第 ' + (lyh_index + 1) + ' / ' + lyh_total + ' 张';
+  }
+  lyh_layout();
+
+  // ── lyh_touch: 触摸开始 ──
+  lyh_stage.addEventListener('touchstart', function (lyh_e) {
+    if (lyh_cooling) return;  // lyh_冷却中，忽略
+    lyh_startX = lyh_e.changedTouches[0].clientX;
+    lyh_hint.classList.remove('show');  // lyh_开始新滑动就隐藏边界提示
+  }, { passive: true });  // lyh_passive:true 告诉浏览器不拦截默认滚动
+
+  // ── lyh_touch: 触摸结束，计算位移决定是否切换 ──
+  lyh_stage.addEventListener('touchend', function (lyh_e) {
+    if (lyh_cooling) return;
+
+    var lyh_endX = lyh_e.changedTouches[0].clientX;
+    var lyh_deltaX = lyh_endX - lyh_startX;  // 正 = 右滑，负 = 左滑
+
+    if (Math.abs(lyh_deltaX) < LYH_THRESHOLD) {
+      // lyh_短距离误触：阈值内不切换
+      return;
+    }
+
+    if (lyh_deltaX < 0) {
+      // lyh_向左滑 → 下一张
+      if (lyh_index >= lyh_total - 1) {
+        lyh_showHint('已经是最后一张啦');
+        return;
+      }
+      lyh_index++;
+      lyh_layout();
+    } else {
+      // lyh_向右滑 → 上一张
+      if (lyh_index <= 0) {
+        lyh_showHint('已经是第一张啦');
+        return;
+      }
+      lyh_index--;
+      lyh_layout();
+    }
+
+    // lyh_切换成功后，进入冷却锁
+    lyh_cooling = true;
+    setTimeout(function () { lyh_cooling = false; }, LYH_COOLDOWN);
+  }, { passive: true });
+
+  // ── lyh_边界提示：2 秒后自动消失 ──
+  function lyh_showHint(lyh_text) {
+    lyh_hint.textContent = lyh_text;
+    lyh_hint.classList.add('show');
+    setTimeout(function () { lyh_hint.classList.remove('show'); }, 1500);
+  }
+</script>
+</body>
+</html>
