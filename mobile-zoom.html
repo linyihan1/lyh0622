@@ -12,16 +12,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>任务三 · 图片查看器 | 双指缩放 + 双击放大</title>
   <style>
-    /* lyh_全局：禁止浏览器默认手势干扰（缩放/选字/长按菜单） */
     * { -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
-    html, body {
-      margin: 0; padding: 0; height: 100%;
-      background: #111; color: #eee;
-      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-      overflow: hidden;
-    }
+    html, body { margin: 0; padding: 0; height: 100%; background: #111; color: #eee;
+      font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; overflow: hidden; }
 
-    /* lyh_顶部栏 */
+    /* lyh_顶部：缩放比例实时显示 */
     .lyh-topbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       background: rgba(0,0,0,.6); backdrop-filter: blur(8px);
@@ -33,27 +28,21 @@
       background: rgba(255,255,255,.15); padding: 3px 10px; border-radius: 12px; font-weight: 600;
     }
 
-    /* lyh_缩放容器：核心！overflow:hidden + touch-action:none + user-select:none */
+    /* lyh_核心容器：overflow:hidden + touch-action:none + user-select:none */
     .lyh-viewer {
-      position: relative;
-      width: 100vw; height: 100vh;
-      overflow: hidden;
-      touch-action: none;
-      user-select: none;
-      background: #000;
+      position: relative; width: 100vw; height: 100vh;
+      overflow: hidden; touch-action: none; user-select: none; background: #000;
     }
 
-    /* lyh_图片：用 transform 做平移 + 缩放，性能最好（GPU 加速） */
+    /* lyh_图片：用 transform 做平移缩放，transform-origin:0 0 方便计算 */
     .lyh-image {
       position: absolute; top: 50%; left: 50%;
       max-width: 100%; max-height: 100%;
-      /* lyh_关键：默认 transform 是 translate(-50%,-50%) scale(1)，居中显示 */
-      transform-origin: 0 0;  /* lyh_让 transform 以图片左上角为基准，计算更可控 */
+      transform-origin: 0 0;
       will-change: transform;
-      pointer-events: none;  /* lyh_不让图片吃掉触摸事件，事件交给 viewer */
+      pointer-events: none;
     }
 
-    /* lyh_底部操作提示 */
     .lyh-hint-bar {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
       background: rgba(0,0,0,.7); padding: 10px 16px;
@@ -66,15 +55,12 @@
 </head>
 <body>
 
-  <!-- lyh_顶部：缩放比例实时显示 -->
   <div class="lyh-topbar">
     <span class="lyh-title">🔍 双指缩放查看器</span>
     <span class="lyh-scale-text" id="lyh_scaleText">1.0x</span>
   </div>
 
-  <!-- lyh_核心容器：overflow:hidden + touch-action:none -->
   <div class="lyh-viewer" id="lyh_viewer">
-    <!-- lyh_图片：用 transform 做平移和缩放 -->
     <img class="lyh-image" id="lyh_img"
          src="swiper-imgs/aida_modu.jpg"
          alt="爱达·魔都号 · 双击放大 / 双指缩放 1~4x" />
@@ -87,249 +73,158 @@
 <script>
   // ══════════════════════════════════════════════════════════
   //  lyh_图片查看器核心逻辑
-  //  lyh_技术要点：
-  //    1) 图片 transform 用 translate(x,y) scale(s) 控制，transform-origin:0 0
-  //    2) 缩放以两指中点为基准 → 缩放后图片在视觉上"不跳"
-  //    3) 松手限制边界 → 1x 时图片居中且不出界；放大后平移不超出图片边缘
-  //    4) 双击在 1x ↔ 2x 间切换，带 0.25s 过渡
+  //  技术要点：
+  //    1) 图片 transform-origin:0 0 → transform:translate(x,y) scale(s)
+  //    2) 缩放以两指中点为基准 → 锚点屏幕坐标不变 → 视觉"不跳"
+  //    3) 松手边界限制 → 1x 时居中；放大后不超出图片边缘
+  //    4) 双击 1x ↔ 2x 带 0.25s 过渡
   // ══════════════════════════════════════════════════════════
 
   var lyh_viewer = document.getElementById('lyh_viewer');
   var lyh_img = document.getElementById('lyh_img');
   var lyh_scaleText = document.getElementById('lyh_scaleText');
 
-  // lyh_核心状态变量
-  var lyh_state = {
-    scale: 1,          // 当前缩放倍数
-    tx: 0,             // 当前 translateX（相对初始居中状态的偏移）
-    ty: 0,             // 当前 translateY
-    width: 0,          // 图片显示宽度（含 scale）
-    height: 0,         // 图片显示高度
-  };
-  var LYH_MIN = 1;       // 最小 1 倍
-  var LYH_MAX = 4;       // 最大 4 倍
+  // lyh_核心状态
+  var lyh_state = { scale: 1, tx: 0, ty: 0, width: 0, height: 0 };
+  var LYH_MIN = 1, LYH_MAX = 4;
 
-  // lyh_交互时临时变量
-  var lyh_touchMode = null;   // 'none' / 'drag' / 'pinch'
-  var lyh_lastDist = 0;       // 双指上一帧距离
-  var lyh_startPinchScale = 1;// 双指开始时的 scale（缩放基准）
-  var lyh_startDist = 0;      // 双指起始距离
-  var lyh_startMidX = 0, lyh_startMidY = 0;  // 双指起始中点
-  var lyh_dragStartTx = 0, lyh_dragStartTy = 0;  // 拖动起点时的 tx/ty
-  var lyh_lastTouchX = 0, lyh_lastTouchY = 0;     // 单指拖动上一帧位置
-
-  // lyh_双击检测
+  // lyh_交互临时变量
+  var lyh_mode = 'none';
+  var lyh_lastDist = 0, lyh_startDist = 0;
+  var lyh_startPinchScale = 1;
+  var lyh_startMidX = 0, lyh_startMidY = 0;
+  var lyh_lastTouchX = 0, lyh_lastTouchY = 0;
   var lyh_lastTapTime = 0;
 
-  // ── lyh_初始化：图片先加载完再算尺寸 ──
+  // lyh_初始化
   lyh_img.addEventListener('load', lyh_init);
-  // lyh_有时图片已缓存，手动触发一次
   if (lyh_img.complete) lyh_init();
 
   function lyh_init() {
-    // lyh_让图片按容器等比缩放填满（但不超过原始尺寸）
-    var lyh_vw = lyh_viewer.clientWidth;
-    var lyh_vh = lyh_viewer.clientHeight;
-    var lyh_ratio = Math.min(lyh_vw / lyh_img.naturalWidth, lyh_vh / lyh_img.naturalHeight);
-    // lyh_初始就是等比填满容器
-    lyh_img.style.width = (lyh_img.naturalWidth * lyh_ratio) + 'px';
-    lyh_img.style.height = (lyh_img.naturalHeight * lyh_ratio) + 'px';
+    var vw = lyh_viewer.clientWidth, vh = lyh_viewer.clientHeight;
+    var ratio = Math.min(vw / lyh_img.naturalWidth, vh / lyh_img.naturalHeight);
+    lyh_img.style.width = (lyh_img.naturalWidth * ratio) + 'px';
+    lyh_img.style.height = (lyh_img.naturalHeight * ratio) + 'px';
     lyh_state.width = lyh_img.clientWidth;
     lyh_state.height = lyh_img.clientHeight;
     lyh_applyTransform();
   }
 
-  // ── lyh_把 state 渲染到 transform ──
+  // lyh_把 state 渲染到 transform
   function lyh_applyTransform() {
-    // lyh_公式：translate(居中偏移 + 拖动偏移) scale(当前缩放)
-    // lyh_居中：translateX(-50%) translateY(-50%) 让图片中心对准容器中心
-    // lyh_然后叠加用户拖动的 tx / ty
-    var lyh_w = lyh_state.width * lyh_state.scale;
-    var lyh_h = lyh_state.height * lyh_state.scale;
-    var lyh_vw = lyh_viewer.clientWidth;
-    var lyh_vh = lyh_viewer.clientHeight;
-    // lyh_transform-origin:0 0 下的居中公式：
-    var lyh_baseX = (lyh_vw - lyh_w) / 2;
-    var lyh_baseY = (lyh_vh - lyh_h) / 2;
-    var lyh_finalX = lyh_baseX + lyh_state.tx;
-    var lyh_finalY = lyh_baseY + lyh_state.ty;
-
-    lyh_img.style.transform = 'translate(' + lyh_finalX + 'px,' + lyh_finalY + 'px) scale(' + lyh_state.scale + ')';
+    var w = lyh_state.width * lyh_state.scale;
+    var h = lyh_state.height * lyh_state.scale;
+    var vw = lyh_viewer.clientWidth, vh = lyh_viewer.clientHeight;
+    var baseX = (vw - w) / 2, baseY = (vh - h) / 2;
+    var fx = baseX + lyh_state.tx, fy = baseY + lyh_state.ty;
+    lyh_img.style.transform = 'translate(' + fx + 'px,' + fy + 'px) scale(' + lyh_state.scale + ')';
     lyh_scaleText.textContent = lyh_state.scale.toFixed(1) + 'x';
   }
 
-  // ── lyh_边界限制：松手后不允许图片被拖出可视区域 ──
-  function lyh_clampTxTy() {
-    var lyh_w = lyh_state.width * lyh_state.scale;
-    var lyh_h = lyh_state.height * lyh_state.scale;
-    var lyh_vw = lyh_viewer.clientWidth;
-    var lyh_vh = lyh_viewer.clientHeight;
-
-    // lyh_w <= 容器宽 → 图片比屏幕小 → tx 必须为 0（水平居中）
-    if (lyh_w <= lyh_vw) {
-      lyh_state.tx = 0;
-    } else {
-      // lyh_w > 容器宽 → 允许拖动范围：-(图片超出部分) ~ +0
-      var lyh_maxOffsetX = (lyh_w - lyh_vw) / 2;
-      lyh_state.tx = Math.max(-lyh_maxOffsetX, Math.min(lyh_maxOffsetX, lyh_state.tx));
-    }
-    // lyh_同理 Y 方向
-    if (lyh_h <= lyh_vh) {
-      lyh_state.ty = 0;
-    } else {
-      var lyh_maxOffsetY = (lyh_h - lyh_vh) / 2;
-      lyh_state.ty = Math.max(-lyh_maxOffsetY, Math.min(lyh_maxOffsetY, lyh_state.ty));
-    }
+  // lyh_边界限制：松手后
+  function lyh_clamp() {
+    var w = lyh_state.width * lyh_state.scale;
+    var h = lyh_state.height * lyh_state.scale;
+    var vw = lyh_viewer.clientWidth, vh = lyh_viewer.clientHeight;
+    if (w <= vw) lyh_state.tx = 0;
+    else { var m = (w - vw) / 2; lyh_state.tx = Math.max(-m, Math.min(m, lyh_state.tx)); }
+    if (h <= vh) lyh_state.ty = 0;
+    else { var n = (h - vh) / 2; lyh_state.ty = Math.max(-n, Math.min(n, lyh_state.ty)); }
     lyh_applyTransform();
   }
 
-  // ── lyh_Touch 事件统一入口 ──
-  lyh_viewer.addEventListener('touchstart', lyh_onTouchStart, { passive: false });
-  lyh_viewer.addEventListener('touchmove',  lyh_onTouchMove,  { passive: false });
-  lyh_viewer.addEventListener('touchend',  lyh_onTouchEnd,   { passive: false });
-  lyh_viewer.addEventListener('touchcancel', lyh_onTouchEnd, { passive: false });
+  // lyh_Touch 事件
+  lyh_viewer.addEventListener('touchstart', onStart, { passive: false });
+  lyh_viewer.addEventListener('touchmove',  onMove,  { passive: false });
+  lyh_viewer.addEventListener('touchend',   onEnd,   { passive: false });
+  lyh_viewer.addEventListener('touchcancel', onEnd,  { passive: false });
 
-  function lyh_onTouchStart(lyh_e) {
-    lyh_e.preventDefault();  // lyh_阻止浏览器默认手势（下拉/滚动/双击缩放）
-    var lyh_touches = lyh_e.touches;
-
-    if (lyh_touches.length === 1) {
-      // lyh_单指：记录拖动起点 + 检测双击
-      lyh_touchMode = 'drag';
-      lyh_lastTouchX = lyh_touches[0].clientX;
-      lyh_lastTouchY = lyh_touches[0].clientY;
-      lyh_dragStartTx = lyh_state.tx;
-      lyh_dragStartTy = lyh_state.ty;
-
-      // lyh_双击检测：两次 tap 间隔 < 300ms → 切换 1x/2x
-      var lyh_now = Date.now();
-      if (lyh_now - lyh_lastTapTime < 300) {
-        lyh_toggleDoubleTap();
-      }
-      lyh_lastTapTime = lyh_now;
-
-    } else if (lyh_touches.length === 2) {
-      // lyh_双指：进入缩放模式
-      lyh_touchMode = 'pinch';
-      lyh_startDist = lyh_getDist(lyh_touches[0], lyh_touches[1]);
+  function onStart(e) {
+    e.preventDefault();
+    var t = e.touches;
+    if (t.length === 1) {
+      lyh_mode = 'drag';
+      lyh_lastTouchX = t[0].clientX; lyh_lastTouchY = t[0].clientY;
+      // lyh_双击检测
+      var now = Date.now();
+      if (now - lyh_lastTapTime < 300) lyh_toggleDoubleTap();
+      lyh_lastTapTime = now;
+    } else if (t.length === 2) {
+      lyh_mode = 'pinch';
+      lyh_startDist = getDist(t[0], t[1]);
       lyh_startPinchScale = lyh_state.scale;
-      lyh_startMidX = (lyh_touches[0].clientX + lyh_touches[1].clientX) / 2;
-      lyh_startMidY = (lyh_touches[0].clientY + lyh_touches[1].clientY) / 2;
+      lyh_startMidX = (t[0].clientX + t[1].clientX) / 2;
+      lyh_startMidY = (t[0].clientY + t[1].clientY) / 2;
     }
   }
 
-  function lyh_onTouchMove(lyh_e) {
-    lyh_e.preventDefault();
-    var lyh_touches = lyh_e.touches;
-
-    if (lyh_touchMode === 'drag' && lyh_touches.length === 1) {
-      // lyh_单指拖动：scale <= 1 时也允许拖动（但松手会被 clamp 回 0）
-      var lyh_dx = lyh_touches[0].clientX - lyh_lastTouchX;
-      var lyh_dy = lyh_touches[0].clientY - lyh_lastTouchY;
-      lyh_state.tx += lyh_dx;
-      lyh_state.ty += lyh_dy;
-      lyh_lastTouchX = lyh_touches[0].clientX;
-      lyh_lastTouchY = lyh_touches[0].clientY;
+  function onMove(e) {
+    e.preventDefault();
+    var t = e.touches;
+    if (lyh_mode === 'drag' && t.length === 1) {
+      lyh_state.tx += t[0].clientX - lyh_lastTouchX;
+      lyh_state.ty += t[0].clientY - lyh_lastTouchY;
+      lyh_lastTouchX = t[0].clientX; lyh_lastTouchY = t[0].clientY;
       lyh_applyTransform();
-
-    } else if (lyh_touchMode === 'pinch' && lyh_touches.length === 2) {
-      // lyh_双指缩放：按当前距离 / 起始距离 计算新 scale
-      var lyh_currDist = lyh_getDist(lyh_touches[0], lyh_touches[1]);
-      var lyh_ratio = lyh_currDist / lyh_startDist;
-      var lyh_newScale = Math.max(LYH_MIN, Math.min(LYH_MAX, lyh_startPinchScale * lyh_ratio));
-
-      // lyh_关键技术点：缩放以两指中点为基准 → 图片视觉上"不跳"
-      // 原理：缩放后，图片在两指中点处的像素位置必须保持不变
-      lyh_scaleAtPoint(lyh_newScale, lyh_startMidX, lyh_startMidY);
+    } else if (lyh_mode === 'pinch' && t.length === 2) {
+      var ratio = getDist(t[0], t[1]) / lyh_startDist;
+      var newScale = Math.max(LYH_MIN, Math.min(LYH_MAX, lyh_startPinchScale * ratio));
+      lyh_scaleAtPoint(newScale, lyh_startMidX, lyh_startMidY);
     }
   }
 
-  function lyh_onTouchEnd(lyh_e) {
-    lyh_e.preventDefault();
-
-    if (lyh_touchMode === 'pinch' || (lyh_touchMode === 'drag' && lyh_state.scale > 1)) {
-      // lyh_缩放完 或 放大状态下拖动完 → 限制边界
-      lyh_clampTxTy();
-    } else if (lyh_touchMode === 'drag' && lyh_state.scale <= 1) {
-      // lyh_1x 状态下拖动完 → 自动居中
+  function onEnd(e) {
+    e.preventDefault();
+    if (lyh_mode === 'pinch' || (lyh_mode === 'drag' && lyh_state.scale > 1)) {
+      lyh_clamp();
+    } else if (lyh_mode === 'drag' && lyh_state.scale <= 1) {
       lyh_state.tx = 0; lyh_state.ty = 0;
       lyh_img.style.transition = 'transform .25s ease';
       lyh_applyTransform();
       setTimeout(function () { lyh_img.style.transition = ''; }, 260);
     }
-
-    // lyh_如果还剩一根手指，切换到 drag 模式（双指变单指的容错）
-    if (lyh_e.touches.length === 1) {
-      lyh_touchMode = 'drag';
-      lyh_lastTouchX = lyh_e.touches[0].clientX;
-      lyh_lastTouchY = lyh_e.touches[0].clientY;
-      lyh_dragStartTx = lyh_state.tx;
-      lyh_dragStartTy = lyh_state.ty;
-    } else {
-      lyh_touchMode = 'none';
-    }
+    if (e.touches.length === 1) {
+      lyh_mode = 'drag';
+      lyh_lastTouchX = e.touches[0].clientX; lyh_lastTouchY = e.touches[0].clientY;
+    } else lyh_mode = 'none';
   }
 
-  // ── lyh_计算两点距离 ──
-  function lyh_getDist(t1, t2) {
-    var lyh_dx = t1.clientX - t2.clientX;
-    var lyh_dy = t1.clientY - t2.clientY;
-    return Math.sqrt(lyh_dx * lyh_dx + lyh_dy * lyh_dy);
+  function getDist(a, b) {
+    var dx = a.clientX - b.clientX, dy = a.clientY - b.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
   }
 
-  // ── lyh_核心：以某点为基准缩放（保证"不跳"） ──
-  // lyh_原理：某点的屏幕坐标 = 基准坐标 + tx + (该点在图片中的归一化位置) * width * scale
-  // lyh_让 scale 变化后，这个屏幕坐标不变 → 反推新的 tx
-  function lyh_scaleAtPoint(lyh_newScale, lyh_anchorX, lyh_anchorY) {
-    var lyh_w = lyh_state.width;
-    var lyh_h = lyh_state.height;
-    var lyh_vw = lyh_viewer.clientWidth;
-    var lyh_vh = lyh_viewer.clientHeight;
-
-    // lyh_计算锚点在当前图片坐标系中的位置（归一化 0~1）
-    // 图片当前 transform-origin:0 0，左上角 = (baseX+tx, baseY+ty)
-    var lyh_oldW = lyh_w * lyh_state.scale;
-    var lyh_oldH = lyh_h * lyh_state.scale;
-    var lyh_oldBaseX = (lyh_vw - lyh_oldW) / 2;
-    var lyh_oldBaseY = (lyh_vh - lyh_oldH) / 2;
-    var lyh_pxInImg = (lyh_anchorX - lyh_oldBaseX - lyh_state.tx) / lyh_oldW;
-    var lyh_pyInImg = (lyh_anchorY - lyh_oldBaseY - lyh_state.ty) / lyh_oldH;
-
-    // lyh_缩放后新参数
-    lyh_state.scale = lyh_newScale;
-    var lyh_newW = lyh_w * lyh_newScale;
-    var lyh_newH = lyh_h * lyh_newScale;
-    var lyh_newBaseX = (lyh_vw - lyh_newW) / 2;
-    var lyh_newBaseY = (lyh_vh - lyh_newH) / 2;
-
-    // lyh_反推 tx：锚点新屏幕坐标 = 新 base + tx + px * newW == 锚点原屏幕坐标
-    lyh_state.tx = lyh_anchorX - lyh_newBaseX - lyh_pxInImg * lyh_newW;
-    lyh_state.ty = lyh_anchorY - lyh_newBaseY - lyh_pyInImg * lyh_newH;
-
+  // lyh_核心：以某点为基准缩放 → 保证"不跳"
+  function lyh_scaleAtPoint(newScale, ax, ay) {
+    var w = lyh_state.width, h = lyh_state.height;
+    var vw = lyh_viewer.clientWidth, vh = lyh_viewer.clientHeight;
+    var oldW = w * lyh_state.scale, oldH = h * lyh_state.scale;
+    var oldBaseX = (vw - oldW) / 2, oldBaseY = (vh - oldH) / 2;
+    // lyh_锚点在图片中的归一化位置
+    var px = (ax - oldBaseX - lyh_state.tx) / oldW;
+    var py = (ay - oldBaseY - lyh_state.ty) / oldH;
+    lyh_state.scale = newScale;
+    var newW = w * newScale, newH = h * newScale;
+    var newBaseX = (vw - newW) / 2, newBaseY = (vh - newH) / 2;
+    // lyh_反推 tx/ty：锚点屏幕坐标不变
+    lyh_state.tx = ax - newBaseX - px * newW;
+    lyh_state.ty = ay - newBaseY - py * newH;
     lyh_applyTransform();
   }
 
-  // ── lyh_双击切换 1x ↔ 2x ──
   function lyh_toggleDoubleTap() {
     lyh_img.style.transition = 'transform .25s ease';
     if (lyh_state.scale > 1.2) {
-      // lyh_当前已放大 → 缩回 1x 并居中
-      lyh_state.scale = 1;
-      lyh_state.tx = 0;
-      lyh_state.ty = 0;
+      lyh_state.scale = 1; lyh_state.tx = 0; lyh_state.ty = 0;
     } else {
-      // lyh_当前 1x 或接近 → 放大到 2x，以容器中心为基准
       lyh_scaleAtPoint(2, lyh_viewer.clientWidth / 2, lyh_viewer.clientHeight / 2);
-      lyh_clampTxTy();
+      lyh_clamp();
     }
     lyh_applyTransform();
     setTimeout(function () { lyh_img.style.transition = ''; }, 260);
   }
 
-  // lyh_窗口 resize 时重新初始化
-  window.addEventListener('resize', function () {
-    lyh_init();
-  });
+  window.addEventListener('resize', lyh_init);
 </script>
 </body>
 </html>

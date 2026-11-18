@@ -2,8 +2,7 @@
   lyh_mobile-sensor.html — 任务四·摇一摇彩蛋：摇手机抽今日菜谱
   作者：林奕含  学号：24002120622
   时间：2026-11-18  模型：Trae
-  功能：监听 devicemotion 加速度 → 超过阈值 → 1.5s 冷却 → 随机抽菜谱 → 弹出动画
-  降级方案：① iOS 需手动请求权限 ② 不支持加速度的设备显示按钮
+  功能：devicemotion 加速度传感器 → 阈值 18 触发 → 1.5s 冷却 → iOS 权限 → 不支持降级按钮
   命名约定：所有 CSS 类 / HTML id / JS 变量函数 均以 lyh_ 开头
 -->
 <!DOCTYPE html>
@@ -22,42 +21,30 @@
       display: flex; flex-direction: column; align-items: center;
     }
 
-    /* lyh_顶部标题 */
-    .lyh-header {
-      text-align: center; padding: 24px 16px 8px; color: #fff;
-    }
+    .lyh-header { text-align: center; padding: 24px 16px 8px; color: #fff; }
     .lyh-header h1 { font-size: 24px; margin: 0 0 4px; }
     .lyh-header p { margin: 0; font-size: 13px; opacity: .85; }
 
-    /* lyh_中间的大摇一摇按钮 / 提示区 */
-    .lyh-shake-area {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      width: 100%;
-    }
+    .lyh-shake-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
 
-    /* lyh_摇一摇大图标：用 emoji + 脉冲动画 */
+    /* lyh_摇一摇大图标 + 脉冲动画 */
     .lyh-shake-icon {
       font-size: 120px; line-height: 1;
       animation: lyh_pulse 2s ease-in-out infinite;
       filter: drop-shadow(0 8px 20px rgba(0,0,0,.3));
     }
-    @keyframes lyh_pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-    }
-    /* lyh_真摇的时候加这个 class：抖动动画 */
-    .lyh-shaking .lyh-shake-icon {
-      animation: lyh_shake 0.4s ease-in-out;
-    }
+    @keyframes lyh_pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+    /* lyh_摇动时触发抖动 */
+    .lyh-shaking .lyh-shake-icon { animation: lyh_shake 0.4s ease-in-out; }
     @keyframes lyh_shake {
-      0%, 100% { transform: translateX(0) rotate(0); }
-      20% { transform: translateX(-12px) rotate(-5deg); }
-      40% { transform: translateX(12px) rotate(5deg); }
-      60% { transform: translateX(-8px) rotate(-3deg); }
-      80% { transform: translateX(8px) rotate(3deg); }
+      0%,100%{transform:translateX(0) rotate(0)}
+      20%{transform:translateX(-12px) rotate(-5deg)}
+      40%{transform:translateX(12px) rotate(5deg)}
+      60%{transform:translateX(-8px) rotate(-3deg)}
+      80%{transform:translateX(8px) rotate(3deg)}
     }
 
-    /* lyh_状态提示文字 */
     .lyh-status {
       margin-top: 20px; padding: 10px 20px;
       background: rgba(255,255,255,.18); backdrop-filter: blur(6px);
@@ -66,58 +53,39 @@
     .lyh-status.cooldown { background: rgba(255,152,0,.8); }
     .lyh-status.error { background: rgba(244,67,54,.85); }
 
-    /* lyh_降级按钮（设备不支持加速度 或 iOS 未授权） */
+    /* lyh_降级按钮 */
     .lyh-fallback-btn {
-      margin-top: 24px;
-      padding: 12px 32px; font-size: 16px; font-weight: 600;
+      margin-top: 24px; padding: 12px 32px; font-size: 16px; font-weight: 600;
       background: #fff; color: #764ba2;
       border: none; border-radius: 28px;
       box-shadow: 0 4px 16px rgba(0,0,0,.2);
-      display: none;  /* lyh_默认隐藏，JS 检测到不支持才 show */
-      cursor: pointer;
+      display: none; cursor: pointer;
     }
     .lyh-fallback-btn.show { display: inline-block; }
 
     /* lyh_结果弹出卡片 */
     .lyh-result-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,.5);
-      display: none; align-items: center; justify-content: center;
-      z-index: 200;
+      display: none; align-items: center; justify-content: center; z-index: 200;
     }
-    .lyh-result-overlay.show {
-      display: flex; animation: lyh_fadeIn .3s ease;
-    }
-    @keyframes lyh_fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .lyh-result-overlay.show { display: flex; animation: lyh_fadeIn .3s ease; }
+    @keyframes lyh_fadeIn { from{opacity:0} to{opacity:1} }
 
     .lyh-result-card {
-      width: 80vw; max-width: 360px;
-      background: #fff; border-radius: 20px; overflow: hidden;
+      width: 80vw; max-width: 360px; background: #fff; border-radius: 20px; overflow: hidden;
       transform: scale(0.6); opacity: 0;
-      animation: lyh_pop 0.4s cubic-bezier(.34,1.56,.64,1) forwards;
+      animation: lyh_pop .4s cubic-bezier(.34,1.56,.64,1) forwards;
       box-shadow: 0 20px 48px rgba(0,0,0,.35);
     }
-    @keyframes lyh_pop {
-      to { transform: scale(1); opacity: 1; }
-    }
-    .lyh-result-card img {
-      width: 100%; height: 200px; object-fit: cover; display: block;
-    }
+    @keyframes lyh_pop { to{transform:scale(1);opacity:1} }
+    .lyh-result-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
     .lyh-result-body { padding: 16px 20px 20px; text-align: center; }
-    .lyh-result-body .lyh-comingSoon {
-      position: absolute; top: 10px; right: 10px;
-      background: rgba(255,255,255,.9); padding: 2px 8px; border-radius: 10px; font-size: 10px; color: #999;
-    }
-    .lyh-result-body h2 {
-      margin: 0 0 6px; font-size: 20px; color: #333;
-    }
-    .lyh-result-body p {
-      margin: 0; font-size: 13px; color: #666; line-height: 1.6;
-    }
+    .lyh-result-body h2 { margin: 0 0 6px; font-size: 20px; color: #333; }
+    .lyh-result-body p { margin: 0; font-size: 13px; color: #666; line-height: 1.6; }
     .lyh-result-body button {
       margin-top: 14px; padding: 8px 24px;
       background: linear-gradient(90deg, #667eea, #764ba2);
-      color: #fff; border: none; border-radius: 16px;
-      font-size: 14px; cursor: pointer;
+      color: #fff; border: none; border-radius: 16px; font-size: 14px; cursor: pointer;
     }
   </style>
 </head>
@@ -129,17 +97,11 @@
   </div>
 
   <div class="lyh-shake-area" id="lyh_shakeArea">
-    <!-- lyh_摇一摇大图标 -->
     <div class="lyh-shake-icon" id="lyh_shakeIcon">📱</div>
-
-    <!-- lyh_状态文字（摇一摇 / 冷却中 / 不支持） -->
     <div class="lyh-status" id="lyh_status">📲 请在手机上摇一摇</div>
-
-    <!-- lyh_降级按钮：JS 检测到不支持加速度时显示 -->
     <button class="lyh-fallback-btn" id="lyh_fallbackBtn">🔄 点我抽菜谱</button>
   </div>
 
-  <!-- lyh_结果弹出卡片 -->
   <div class="lyh-result-overlay" id="lyh_overlay">
     <div class="lyh-result-card">
       <img id="lyh_resultImg" src="" alt="今日菜谱" />
@@ -154,15 +116,15 @@
 <script>
   // ══════════════════════════════════════════════════════════
   //  lyh_摇一摇彩蛋核心逻辑
-  //  lyh_技术要点：
-  //    1) 监听 devicemotion 事件，读取 accelerationIncludingGravity 或 acceleration
-  //    2) 计算合成加速度 magnitude = sqrt(x² + y² + z²)
-  //    3) magnitude > 阈值(约 18) → 判定为摇动 → 1.5s 冷却
-  //    4) 不支持加速度 → 降级按钮
-  //    5) iOS 13+ 需要手动请求 DeviceMotionEvent.requestPermission()
+  //  技术要点：
+  //    1) 监听 devicemotion，读取 accelerationIncludingGravity / acceleration
+  //    2) 合成加速度 magnitude = sqrt(x² + y² + z²)
+  //    3) > 阈值 18 → 触发摇动 → 1.5s 冷却锁
+  //    4) iOS 13+ 需要 DeviceMotionEvent.requestPermission()
+  //    5) 不支持 → 降级为手动按钮
   // ══════════════════════════════════════════════════════════
 
-  // lyh_菜谱数据库（6 道菜 + AI 图）
+  // lyh_菜谱数据库（6 道 + 图片路径）
   var LYH_MENUS = [
     { name: '🍲 番茄鸡蛋面', desc: '快手早餐首选，酸甜开胃，10 分钟搞定。', img: 'swiper-imgs/fuxing_1.jpg' },
     { name: '🍛 红烧肉盖饭',   desc: '肥而不腻，入口即化，一顿两碗没问题。', img: 'swiper-imgs/tiangong_1.jpg' },
@@ -177,19 +139,17 @@
   var lyh_fallbackBtn = document.getElementById('lyh_fallbackBtn');
   var lyh_overlay = document.getElementById('lyh_overlay');
 
-  var LYH_THRESHOLD = 18;     // lyh_加速度阈值（m/s²，约 1.8g）
-  var LYH_COOLDOWN = 1500;    // lyh_冷却时间 1.5s
-  var lyh_isCooling = false;  // lyh_冷却锁
+  var LYH_THRESHOLD = 18;    // lyh_加速度阈值（约 1.8g）
+  var LYH_COOLDOWN = 1500;  // lyh_冷却 1.5s
+  var lyh_isCooling = false;
 
-  // ── lyh_1. 先检测环境 + 申请权限 ──
-  function lyh_initSensor() {
-    // lyh_判断是否支持 devicemotion
+  // lyh_1. 检测环境 + 申请权限
+  function lyh_init() {
     if (!('DeviceMotionEvent' in window)) {
-      lyh_onSensorUnsupported('当前设备不支持加速度传感器，请手动点击按钮抽菜谱');
+      lyh_fallback('当前设备不支持加速度传感器，请手动点击抽菜谱');
       return;
     }
-
-    // lyh_iOS 13+ 需要手动请求权限
+    // lyh_iOS 13+ 需手动请求
     if (typeof DeviceMotionEvent.requestPermission === 'function') {
       lyh_status.textContent = '📲 iOS 需要授权，请点击下方按钮';
       lyh_fallbackBtn.textContent = '🔑 开启传感器授权';
@@ -201,51 +161,34 @@
             lyh_fallbackBtn.classList.remove('show');
             lyh_startListening();
           } else {
-            lyh_status.textContent = '❌ 授权被拒绝，降级为手动点击';
-            lyh_fallbackBtn.textContent = '🔄 点我抽菜谱';
-            lyh_fallbackBtn.onclick = lyh_pickRandom;
+            lyh_fallback('❌ 授权被拒绝，降级为手动点击');
           }
         }).catch(function () {
-          lyh_onSensorUnsupported('授权失败，请手动点击抽菜谱');
+          lyh_fallback('授权失败，请手动点击抽菜谱');
         });
       };
     } else {
-      // lyh_Android / PC：直接监听
       lyh_startListening();
     }
   }
 
-  // ── lyh_2. 正式监听 devicemotion ──
+  // lyh_2. 监听 devicemotion
   function lyh_startListening() {
-    window.addEventListener('devicemotion', function (lyh_e) {
+    window.addEventListener('devicemotion', function (e) {
       if (lyh_isCooling) return;
-
-      var lyh_acc = lyh_e.accelerationIncludingGravity || lyh_e.acceleration;
-      if (!lyh_acc) {
-        lyh_onSensorUnsupported('无法读取加速度数据，请手动点击');
-        return;
-      }
-
-      // lyh_计算合成加速度 magnitude = sqrt(x² + y² + z²)
-      var lyh_x = lyh_acc.x || 0;
-      var lyh_y = lyh_acc.y || 0;
-      var lyh_z = lyh_acc.z || 0;
-      var lyh_mag = Math.sqrt(lyh_x * lyh_x + lyh_y * lyh_y + lyh_z * lyh_z);
-
-      if (lyh_mag > LYH_THRESHOLD) {
-        lyh_onShakeDetected();
-      }
+      var acc = e.accelerationIncludingGravity || e.acceleration;
+      if (!acc) { lyh_fallback('无法读取加速度数据'); return; }
+      var mag = Math.sqrt((acc.x||0)**2 + (acc.y||0)**2 + (acc.z||0)**2);
+      if (mag > LYH_THRESHOLD) lyh_onShake();
     });
     lyh_status.textContent = '📲 摇一摇，揭晓今日菜谱';
   }
 
-  // ── lyh_3. 检测到摇动 ──
-  function lyh_onShakeDetected() {
+  // lyh_3. 检测到摇动
+  function lyh_onShake() {
     lyh_isCooling = true;
     lyh_status.textContent = '🎲 摇动中！抽取今日菜谱...';
     lyh_status.classList.add('cooldown');
-
-    // lyh_给图标加抖动动画
     lyh_shakeArea.classList.add('lyh-shaking');
 
     setTimeout(function () {
@@ -253,7 +196,6 @@
       lyh_pickRandom();
     }, 400);
 
-    // lyh_1.5 秒冷却
     setTimeout(function () {
       lyh_isCooling = false;
       lyh_status.classList.remove('cooldown');
@@ -261,43 +203,35 @@
     }, LYH_COOLDOWN);
   }
 
-  // ── lyh_4. 降级处理 ──
-  function lyh_onSensorUnsupported(lyh_msg) {
-    lyh_status.textContent = lyh_msg;
+  // lyh_4. 降级处理
+  function lyh_fallback(msg) {
+    lyh_status.textContent = msg;
     lyh_status.classList.add('error');
     lyh_fallbackBtn.textContent = '🔄 点我抽菜谱';
     lyh_fallbackBtn.classList.add('show');
     lyh_fallbackBtn.onclick = lyh_pickRandom;
   }
 
-  // ── lyh_5. 随机抽菜谱并弹出 ──
+  // lyh_5. 抽菜谱弹出
   function lyh_pickRandom() {
-    var lyh_idx = Math.floor(Math.random() * LYH_MENUS.length);
-    var lyh_menu = LYH_MENUS[lyh_idx];
-    document.getElementById('lyh_resultImg').src = lyh_menu.img;
-    document.getElementById('lyh_resultName').textContent = lyh_menu.name;
-    document.getElementById('lyh_resultDesc').textContent = lyh_menu.desc;
+    var idx = Math.floor(Math.random() * LYH_MENUS.length);
+    var m = LYH_MENUS[idx];
+    document.getElementById('lyh_resultImg').src = m.img;
+    document.getElementById('lyh_resultName').textContent = m.name;
+    document.getElementById('lyh_resultDesc').textContent = m.desc;
     lyh_overlay.classList.add('show');
   }
 
-  function lyh_closeResult() {
-    lyh_overlay.classList.remove('show');
-  }
-
-  // lyh_全局点击遮罩关闭
-  lyh_overlay.addEventListener('click', function (lyh_e) {
-    if (lyh_e.target === lyh_overlay) lyh_closeResult();
+  function lyh_closeResult() { lyh_overlay.classList.remove('show'); }
+  lyh_overlay.addEventListener('click', function (e) {
+    if (e.target === lyh_overlay) lyh_closeResult();
   });
 
-  // ── lyh_启动 ──
-  lyh_initSensor();
+  lyh_init();
 
-  // lyh_桌面调试：按空格键模拟摇一摇
-  document.addEventListener('keydown', function (lyh_e) {
-    if (lyh_e.code === 'Space') {
-      lyh_e.preventDefault();
-      if (!lyh_isCooling) lyh_onShakeDetected();
-    }
+  // lyh_桌面调试：空格键模拟
+  document.addEventListener('keydown', function (e) {
+    if (e.code === 'Space') { e.preventDefault(); if (!lyh_isCooling) lyh_onShake(); }
   });
 </script>
 </body>
