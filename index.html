@@ -62,6 +62,33 @@ html, body {
   line-height: 1.75;
 }
 
+/* lyh_视频区：深色风格适配 */
+.lyh-video-sec {
+  margin-bottom: 60px;
+}
+.lyh-video-label {
+  color: var(--lyh-brass);
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.lyh-video-label::before {
+  content: ''; width: 24px; height: 2px; background: var(--lyh-brass);
+}
+.lyh-video-wrap {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  background: #000;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.lyh-video-wrap video {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: contain; background: #000;
+}
+
 .lyh-list {
   list-style: none;
   display: flex;
@@ -137,6 +164,16 @@ html, body {
     </p>
   </header>
 
+  <!-- lyh_课堂演示视频区 -->
+  <section class="lyh-video-sec">
+    <div class="lyh-video-label">课堂演示视频 · VIDEO</div>
+    <div class="lyh-video-wrap">
+      <video controls autoplay muted loop playsinline preload="metadata">
+        <source src="video.mp4" type="video/mp4" />
+      </video>
+    </div>
+  </section>
+
   <ul class="lyh-list">
     <li class="lyh-list-item">
       <a href="iconfont-1.html">
@@ -208,13 +245,33 @@ html, body {
         <span class="lyh-list-arrow">→</span>
       </a>
     </li>
-    <!-- lyh_移动端手势 / 传感器任务入口 → GitHub Pages 永久 HTTPS -->
+    <!-- lyh_移动端三大任务 → 各自独立页面，相对路径 -->
     <li class="lyh-list-item">
-      <a href="https://linyihan1.github.io/lyh0622/mobile-home.html">
-        <span class="lyh-list-num">📱</span>
+      <a href="mobile-gesture.html">
+        <span class="lyh-list-num">08</span>
         <div class="lyh-list-info">
-          <span class="lyh-list-title">移动端三大任务 · 统一入口</span>
-          <span class="lyh-list-desc">任务二手势卡片 ★★ + 任务三图片查看器 ★★★ + 任务四摇一摇彩蛋 ★★★（GitHub Pages 永久 HTTPS 手机直接开）</span>
+          <span class="lyh-list-title">🍜 手势卡片 · 中华美食</span>
+          <span class="lyh-list-desc">任务二 ★★ · touch 左右滑 · 阈值 60px · 300ms 冷却 · 边界提示</span>
+        </div>
+        <span class="lyh-list-arrow">→</span>
+      </a>
+    </li>
+    <li class="lyh-list-item">
+      <a href="mobile-zoom.html">
+        <span class="lyh-list-num">09</span>
+        <div class="lyh-list-info">
+          <span class="lyh-list-title">🦆 图片查看器 · 美食</span>
+          <span class="lyh-list-desc">任务三 ★★★ · 双指 1~4x 缩放（两指中点不跳）· 双击 1x↔2x · 旋转屏幕状态保持</span>
+        </div>
+        <span class="lyh-list-arrow">→</span>
+      </a>
+    </li>
+    <li class="lyh-list-item">
+      <a href="mobile-sensor.html">
+        <span class="lyh-list-num">10</span>
+        <div class="lyh-list-info">
+          <span class="lyh-list-title">🎰 摇一摇抽菜谱</span>
+          <span class="lyh-list-desc">任务四 ★★★ · devicemotion 加速度 · 阈值 18 · 冷却 1.5s · iOS 权限 · 降级按钮</span>
         </div>
         <span class="lyh-list-arrow">→</span>
       </a>
