@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!--
+  姓名：林奕含| 学号：24002120622 |
+  时间：2026-11-20 | 大模型：Trae
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>科技新闻 · 奕采作品集</title>
+  <link rel="stylesheet" href="css/lyh_style.css">
+  <style>
+    /* lyh: news 页面特有样式 */
+    .lyh_news-page {
+      max-width: 820px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .lyh_news-header {
+      margin-bottom: 20px;
+    }
+    .lyh_news-title {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff, var(--lyh-accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    /* lyh: 顶部接口地址展示条 */
+    .lyh_api-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--lyh-card-border);
+      font-size: 13px;
+      color: var(--lyh-text-dim);
+    }
+    .lyh_api-bar .lyh_api-label {
+      color: var(--lyh-accent-2);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .lyh_api-bar .lyh_api-url {
+      font-family: Consolas, Monaco, monospace;
+      color: var(--lyh-text);
+      word-break: break-all;
+    }
+    .lyh_news-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .lyh_news-card {
+      padding: 18px 20px;
+      border-radius: var(--lyh-radius);
+      background: var(--lyh-card);
+      border: 1px solid var(--lyh-card-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .lyh_news-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(0, 224, 255, 0.4);
+      box-shadow: 0 10px 26px rgba(106, 92, 255, 0.25);
+    }
+    .lyh_news-card-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--lyh-text);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .lyh_news-card-summary {
+      font-size: 14px;
+      color: var(--lyh-text-dim);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .lyh_news-card-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--lyh-text-dim);
+    }
+    .lyh_news-card-meta span::before {
+      margin-right: 4px;
+    }
+    .lyh_meta-source { color: var(--lyh-accent-2); }
+    .lyh_meta-time { color: #8a8db0; }
+    .lyh_tip {
+      text-align: center;
+      padding: 30px;
+      color: var(--lyh-text-dim);
+      font-size: 14px;
+    }
+    .lyh_tip.lyh_error { color: #ff8a8a; }
+    .lyh_back {
+      display: block;
+      text-align: center;
+      margin-top: 26px;
+      color: var(--lyh-text-dim);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s ease;
+    }
+    .lyh_back:hover { color: var(--lyh-accent-2); }
+  </style>
+</head>
+<body>
+  <div class="lyh_news-page">
+    <header class="lyh_news-header">
+      <h1 class="lyh_news-title">科技新闻</h1>
+      <!-- lyh: 顶部显示当前调用的接口地址 -->
+      <div class="lyh_api-bar">
+        <span class="lyh_api-label">当前接口：</span>
+        <span class="lyh_api-url" id="lyh_apiUrl">加载中…</span>
+      </div>
+    </header>
+
+    <!-- lyh: 新闻列表容器，由 js/lyh_news.js 动态渲染 -->
+    <main class="lyh_news-list" id="lyh_newsList">
+      <div class="lyh_tip" id="lyh_tip">正在加载新闻数据…</div>
+    </main>
+
+    <a href="index.html" class="lyh_back">← 返回首页</a>
+  </div>
+
+  <script src="js/lyh_news.js"></script>
+</body>
+</html>

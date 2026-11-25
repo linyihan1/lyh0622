@@ -1,0 +1,6 @@
+backend/.env
+node_modules/
+.trae-html-share-packages/
+backend/images/*
+!backend/images/.gitkeep
+backend/audio/

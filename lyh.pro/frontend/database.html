@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<!--
+  姓名：林奕含| 学号：24002120622 |
+  时间：2026-11-20 | 大模型：Trae
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据库连接 · 奕采作品集</title>
+  <link rel="stylesheet" href="css/lyh_style.css">
+  <style>
+    /* lyh: database 页面特有样式 */
+    .lyh_db-page {
+      max-width: 460px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+    .lyh_db-title {
+      font-size: 26px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 24px;
+      background: linear-gradient(90deg, #fff, var(--lyh-accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .lyh_db-card {
+      padding: 32px 28px;
+      border-radius: var(--lyh-radius);
+      background: var(--lyh-card);
+      border: 1px solid var(--lyh-card-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .lyh_form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .lyh_form-group label {
+      font-size: 13px;
+      color: var(--lyh-text-dim);
+    }
+    .lyh_form-group input {
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--lyh-card-border);
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--lyh-text);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .lyh_form-group input:focus {
+      border-color: var(--lyh-accent-2);
+      box-shadow: 0 0 0 3px rgba(0, 224, 255, 0.15);
+    }
+    .lyh_form-row {
+      display: flex;
+      gap: 12px;
+    }
+    .lyh_form-row .lyh_form-group {
+      flex: 1;
+    }
+    .lyh_btn {
+      margin-top: 6px;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--lyh-accent), var(--lyh-accent-2));
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+    .lyh_btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(106, 92, 255, 0.4);
+    }
+    .lyh_btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .lyh_msg {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-all;
+    }
+    .lyh_msg.lyh_success {
+      color: var(--lyh-success);
+      background: rgba(61, 220, 151, 0.1);
+      border: 1px solid rgba(61, 220, 151, 0.35);
+    }
+    .lyh_msg.lyh_error {
+      color: #ff8a8a;
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.35);
+    }
+    .lyh_back {
+      display: block;
+      text-align: center;
+      margin-top: 22px;
+      color: var(--lyh-text-dim);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s ease;
+    }
+    .lyh_back:hover {
+      color: var(--lyh-accent-2);
+    }
+  </style>
+</head>
+<body>
+  <div class="lyh_db-page">
+    <h1 class="lyh_db-title">数据库连接</h1>
+
+    <!-- lyh: 数据库连接表单，默认填入 root / Lin787806@ -->
+    <form class="lyh_db-card" id="lyh_dbForm" autocomplete="off">
+      <div class="lyh_form-group">
+        <label for="lyh_username">用户名</label>
+        <input type="text" id="lyh_username" name="username" value="root" placeholder="请输入用户名">
+      </div>
+
+      <div class="lyh_form-group">
+        <label for="lyh_password">密码</label>
+        <input type="password" id="lyh_password" name="password" value="Lin787806@" placeholder="请输入密码">
+      </div>
+
+      <div class="lyh_form-row">
+        <div class="lyh_form-group">
+          <label for="lyh_host">主机</label>
+          <input type="text" id="lyh_host" name="host" value="127.0.0.1">
+        </div>
+        <div class="lyh_form-group">
+          <label for="lyh_port">端口</label>
+          <input type="number" id="lyh_port" name="port" value="3306">
+        </div>
+      </div>
+
+      <button type="submit" class="lyh_btn" id="lyh_connectBtn">连接数据库</button>
+
+      <!-- lyh: 成功/错误提示区域 -->
+      <div class="lyh_msg" id="lyh_msg" style="display:none;"></div>
+    </form>
+
+    <a href="index.html" class="lyh_back">← 返回首页</a>
+  </div>
+
+  <script src="js/lyh_database.js"></script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--
+  姓名：林奕含 | 学号：24002120622
+  时间：2026-11-25
+  大模型：DeepSeek-V4.1-Flash
+  说明：知识库（RAG）问答与管理页面
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>知识库问答 | 林奕含</title>
+  <link rel="stylesheet" href="css/lyh_kb.css" />
+</head>
+<body>
+  <div class="lyh_kb_page">
+    <!-- 左侧：知识库管理 -->
+    <aside class="lyh_kb_side">
+      <div class="lyh_kb_brand">
+        <div class="lyh_kb_logo">KB</div>
+        <div>
+          <h1 class="lyh_kb_brand_title">知识库问答</h1>
+          <p class="lyh_kb_brand_sub">RAG 检索增强问答</p>
+        </div>
+      </div>
+
+      <section class="lyh_kb_upload">
+        <div class="lyh_kb_drop" id="lyh_kb_drop">
+          <input
+            type="file"
+            id="lyh_kb_file"
+            accept=".txt,.md,.csv,.pdf,.doc,.docx,.ppt,.pptx"
+            hidden
+          />
+          <p class="lyh_kb_drop_icon">+</p>
+          <p class="lyh_kb_drop_title">点击或拖拽上传文件</p>
+          <p class="lyh_kb_drop_desc">支持 txt / md / csv / pdf / doc / docx / ppt / pptx，单个文件不超过 20MB</p>
+        </div>
+        <p class="lyh_kb_upload_status" id="lyh_kb_status"></p>
+      </section>
+
+      <div class="lyh_kb_list_head">
+        <span>知识库文件</span>
+        <span class="lyh_kb_list_meta" id="lyh_kb_meta">0 个文件 · 0 个分片</span>
+      </div>
+
+      <ul class="lyh_kb_file_list" id="lyh_kb_files"></ul>
+
+      <div class="lyh_kb_side_foot">
+        <p>林奕含 · 24002120622</p>
+        <div class="lyh_kb_navs">
+          <a class="lyh_kb_nav" href="index.html">← AI 聊天</a>
+          <a class="lyh_kb_nav" href="service.html">在线客服 →</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 右侧：基于知识库的问答 -->
+    <main class="lyh_kb_main">
+      <header class="lyh_kb_head">
+        <div>
+          <h2 class="lyh_kb_head_title">知识库智能问答</h2>
+          <p class="lyh_kb_head_sub" id="lyh_kb_model">deepseek-ai/DeepSeek-V4.1-Flash · 仅依据知识库资料作答</p>
+        </div>
+        <div class="lyh_kb_status"><span class="lyh_kb_status_dot"></span>知识库在线</div>
+      </header>
+
+      <section class="lyh_kb_messages" id="lyh_kb_messages">
+        <div class="lyh_kb_welcome">
+          <div class="lyh_kb_welcome_badge">KB</div>
+          <h2 class="lyh_kb_welcome_title">上传资料，开始知识库问答</h2>
+          <p class="lyh_kb_welcome_desc">
+            系统会自动解析文件、切分文本并检索最相关的片段，再交给大模型生成带来源标注的回答。
+          </p>
+          <div class="lyh_kb_chips">
+            <button class="lyh_kb_chip" type="button" data-lyh-question="退货退款需要几天到账？">退款到账时间</button>
+            <button class="lyh_kb_chip" type="button" data-lyh-question="图书借阅一次最多可以借几本？">借阅数量</button>
+            <button class="lyh_kb_chip" type="button" data-lyh-question="会员积分怎么抵扣现金？">积分抵扣规则</button>
+            <button class="lyh_kb_chip" type="button" data-lyh-question="订单什么时候发货？">发货时效</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="lyh_kb_composer">
+        <div class="lyh_kb_input_wrap">
+          <textarea
+            class="lyh_kb_input"
+            id="lyh_kb_input"
+            rows="1"
+            maxlength="500"
+            placeholder="输入你想从知识库中查询的问题，Enter 发送，Shift + Enter 换行"
+          ></textarea>
+          <button class="lyh_kb_send" id="lyh_kb_send" type="button">发送</button>
+        </div>
+        <p class="lyh_kb_tip">回答仅基于知识库文件内容生成，控制台可查看发送给大模型与接收自大模型的完整数据</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/lyh_kb.js"></script>
+</body>
+</html>

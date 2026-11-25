@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!--
+  姓名：林奕含 | 学号：24002120622
+  时间：2026-11-25
+  大模型：DeepSeek-V4.1-Flash
+  说明：语音识别页面（上传或录制语音，返回文字）
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>语音识别 | 林奕含</title>
+  <link rel="stylesheet" href="css/lyh_asr.css" />
+</head>
+<body>
+  <div class="lyh_asr_page">
+    <header class="lyh_asr_topbar">
+      <div class="lyh_asr_topbar_inner">
+        <div class="lyh_asr_brand">
+          <span class="lyh_asr_logo">AI</span>
+          <span class="lyh_asr_brand_name">语音识别</span>
+          <span class="lyh_asr_brand_split"></span>
+          <span class="lyh_asr_brand_page">语音转文字</span>
+        </div>
+        <nav class="lyh_asr_navs">
+          <a class="lyh_asr_nav" href="index.html">AI 聊天</a>
+          <a class="lyh_asr_nav" href="image.html">图像识别</a>
+          <a class="lyh_asr_nav" href="kb.html">知识库问答</a>
+          <a class="lyh_asr_nav" href="service.html">在线客服</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="lyh_asr_main">
+      <!-- 左侧：语音输入 -->
+      <section class="lyh_asr_panel">
+        <h2 class="lyh_asr_panel_title">输入语音</h2>
+        <p class="lyh_asr_panel_desc">支持 wav / mp3 / m4a / webm / ogg / flac / aac / amr，单个文件不超过 20MB</p>
+
+        <div class="lyh_asr_record">
+          <button class="lyh_asr_record_btn" id="lyh_asr_record" type="button">
+            <span class="lyh_asr_record_dot"></span>
+            <span id="lyh_asr_record_text">开始录音</span>
+          </button>
+          <span class="lyh_asr_record_timer" id="lyh_asr_timer">00:00</span>
+        </div>
+
+        <div class="lyh_asr_drop" id="lyh_asr_drop">
+          <input
+            type="file"
+            id="lyh_asr_file"
+            accept="audio/*,.wav,.mp3,.m4a,.webm,.ogg,.flac,.aac,.amr"
+            hidden
+          />
+          <p class="lyh_asr_drop_icon">♪</p>
+          <p class="lyh_asr_drop_title">点击或拖拽音频文件到此处</p>
+          <p class="lyh_asr_drop_hint">也可以直接使用上方麦克风录制语音</p>
+        </div>
+
+        <audio class="lyh_asr_player" id="lyh_asr_player" controls hidden></audio>
+        <div class="lyh_asr_file_meta" id="lyh_asr_meta">尚未选择音频</div>
+
+        <div class="lyh_asr_actions">
+          <button class="lyh_asr_btn lyh_asr_btn_primary" id="lyh_asr_submit" type="button" disabled>开始识别</button>
+          <button class="lyh_asr_btn lyh_asr_btn_ghost" id="lyh_asr_reset" type="button">重新选择</button>
+        </div>
+      </section>
+
+      <!-- 右侧：识别结果 -->
+      <section class="lyh_asr_panel lyh_asr_result_panel">
+        <div class="lyh_asr_result_head">
+          <h2 class="lyh_asr_panel_title">识别结果</h2>
+          <span class="lyh_asr_model" id="lyh_asr_model">Qwen-Audio-3.0-ASR-Flash</span>
+        </div>
+
+        <div class="lyh_asr_result" id="lyh_asr_result">
+          <div class="lyh_asr_result_empty">
+            <div class="lyh_asr_result_badge">AI</div>
+            <p class="lyh_asr_result_empty_title">识别文字将显示在这里</p>
+            <p class="lyh_asr_result_empty_desc">上传音频或录制语音后点击“开始识别”，即可把语音内容转写为文字。</p>
+          </div>
+        </div>
+
+        <p class="lyh_asr_tip">优先使用七牛云 Qwen-Audio-3.0-ASR-Flash，七牛不可用时自动切换硅基流动 SenseVoiceSmall；请求与响应数据会输出到浏览器控制台。</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/lyh_asr.js"></script>
+</body>
+</html>

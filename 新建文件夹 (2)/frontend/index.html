@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!--
+  姓名：林奕含 | 学号：24002120622
+  时间：2026-11-25
+  大模型：DeepSeek-V4.1-Flash
+  说明：AI 聊天应用主页面
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 聊天助手 | 林奕含</title>
+  <link rel="stylesheet" href="css/lyh_chat.css" />
+</head>
+<body>
+  <div class="lyh_app">
+    <!-- 左侧会话栏 -->
+    <aside class="lyh_sidebar">
+      <div class="lyh_brand">
+        <div class="lyh_logo">AI</div>
+        <div class="lyh_brand_text">
+          <h1 class="lyh_brand_title">AI 聊天助手</h1>
+          <p class="lyh_brand_sub">SiliconFlow 大模型</p>
+        </div>
+      </div>
+
+      <button class="lyh_new_btn" id="lyh_newChat" type="button">
+        <span class="lyh_new_icon">+</span>新建对话
+      </button>
+
+      <p class="lyh_session_head">历史会话</p>
+      <ul class="lyh_session_list" id="lyh_sessionList"></ul>
+
+      <div class="lyh_sidebar_foot">
+        <p>林奕含 · 24002120622</p>
+        <p class="lyh_sidebar_foot_sub">课程作业 · 数据仅本地保存</p>
+        <a class="lyh_nav_link" href="asr.html">前往语音识别页面 →</a>
+        <a class="lyh_nav_link" href="image.html">前往图像识别页面 →</a>
+        <a class="lyh_nav_link" href="kb.html">前往知识库问答页面 →</a>
+        <a class="lyh_nav_link" href="service.html">前往在线客服页面 →</a>
+        <a class="lyh_nav_link" href="screenshots.html">查看项目功能截图 →</a>
+      </div>
+    </aside>
+
+    <!-- 右侧聊天区 -->
+    <main class="lyh_main">
+      <header class="lyh_header">
+        <div class="lyh_header_info">
+          <h2 class="lyh_header_title" id="lyh_chatTitle">新的对话</h2>
+          <p class="lyh_header_model" id="lyh_chatModel">deepseek-ai/DeepSeek-V4.1-Flash</p>
+        </div>
+        <div class="lyh_status">
+          <span class="lyh_status_dot"></span>服务在线
+        </div>
+      </header>
+
+      <section class="lyh_messages" id="lyh_messages">
+        <div class="lyh_welcome" id="lyh_welcome">
+          <div class="lyh_welcome_badge">AI</div>
+          <h2 class="lyh_welcome_title">今天想聊点什么？</h2>
+          <p class="lyh_welcome_desc">基于硅基流动大模型，支持多轮上下文对话，回复实时流式输出。</p>
+          <div class="lyh_chips">
+            <button class="lyh_chip" type="button" data-lyh-prompt="用通俗的语言解释一下什么是 RESTful API">解释 RESTful API</button>
+            <button class="lyh_chip" type="button" data-lyh-prompt="帮我写一段 MySQL 联合索引的说明，并给出示例">讲讲 MySQL 联合索引</button>
+            <button class="lyh_chip" type="button" data-lyh-prompt="我是一名大学生，想在后端方向继续深入学习，给我一份学习路线">后端学习路线</button>
+            <button class="lyh_chip" type="button" data-lyh-prompt="帮我把下面这段话润色得更正式：这个功能我觉得还行，就是有点卡">帮我润色一段文字</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="lyh_composer">
+        <div class="lyh_input_wrap">
+          <textarea
+            class="lyh_input"
+            id="lyh_input"
+            rows="1"
+            maxlength="4000"
+            placeholder="输入你的问题，Enter 发送，Shift + Enter 换行"
+          ></textarea>
+          <button class="lyh_send_btn" id="lyh_send" type="button">发送</button>
+        </div>
+        <p class="lyh_tip">内容由 AI 生成，请注意甄别 · 单条消息最多 4000 字</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/lyh_chat.js"></script>
+</body>
+</html>

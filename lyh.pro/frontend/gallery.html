@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<!--
+  姓名：林奕含| 学号：24002120622 |
+  时间：2026-11-20 | 大模型：Trae
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图文列表 · 奕采作品集</title>
+  <link rel="stylesheet" href="css/lyh_style.css">
+  <style>
+    /* lyh: gallery 页面特有样式 - 上图下文网格卡片 */
+    .lyh_gallery-page {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .lyh_gallery-header {
+      margin-bottom: 22px;
+    }
+    .lyh_gallery-title {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff, var(--lyh-accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    /* lyh: 顶部接口地址展示条 */
+    .lyh_api-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--lyh-card-border);
+      font-size: 13px;
+      color: var(--lyh-text-dim);
+    }
+    .lyh_api-bar .lyh_api-label {
+      color: var(--lyh-accent-2);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .lyh_api-bar .lyh_api-url {
+      font-family: Consolas, Monaco, monospace;
+      color: var(--lyh-text);
+      word-break: break-all;
+    }
+    /* lyh: 网格布局 - 自动填充，最小列宽 220px */
+    .lyh_gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .lyh_gallery-card {
+      border-radius: var(--lyh-radius);
+      background: var(--lyh-card);
+      border: 1px solid var(--lyh-card-border);
+      overflow: hidden;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .lyh_gallery-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(0, 224, 255, 0.4);
+      box-shadow: 0 10px 26px rgba(106, 92, 255, 0.25);
+    }
+    /* lyh: 图片容器 - 固定 4:3 比例，自带占位底色，图片失败时露出占位色块 */
+    .lyh_card-imgwrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: linear-gradient(135deg, #4a4e69, #22223b);
+      overflow: hidden;
+    }
+    .lyh_card-img {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .lyh_card-img.lyh_loaded {
+      opacity: 1;
+    }
+    /* lyh: 图片加载失败时的占位文案，位于色块之下，图片加载成功后被覆盖 */
+    .lyh_card-placeholder {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 6px;
+      color: #cfd2e8;
+      font-size: 13px;
+      pointer-events: none;
+    }
+    .lyh_card-placeholder .lyh_ph-icon {
+      font-size: 22px;
+      opacity: 0.8;
+    }
+    .lyh_card-body {
+      padding: 14px 16px 16px;
+    }
+    .lyh_card-category {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--lyh-accent-2);
+      border: 1px solid rgba(0, 224, 255, 0.4);
+      padding: 2px 9px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .lyh_card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--lyh-text);
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+    .lyh_card-desc {
+      font-size: 13px;
+      color: var(--lyh-text-dim);
+      line-height: 1.6;
+    }
+    .lyh_card-time {
+      font-size: 11px;
+      color: #8a8db0;
+      margin-top: 10px;
+    }
+    .lyh_tip {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 30px;
+      color: var(--lyh-text-dim);
+      font-size: 14px;
+    }
+    .lyh_tip.lyh_error { color: #ff8a8a; }
+    .lyh_back {
+      display: block;
+      text-align: center;
+      margin-top: 28px;
+      color: var(--lyh-text-dim);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s ease;
+    }
+    .lyh_back:hover { color: var(--lyh-accent-2); }
+    /* lyh: 手机宽度适配 - 窄屏两列，超窄屏单列 */
+    @media (max-width: 600px) {
+      .lyh_gallery-page { margin: 20px auto; padding: 0 14px; }
+      .lyh_gallery-title { font-size: 22px; }
+      .lyh_gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .lyh_card-body { padding: 10px 12px 12px; }
+      .lyh_card-title { font-size: 14px; }
+      .lyh_card-desc { font-size: 12px; }
+    }
+    @media (max-width: 380px) {
+      .lyh_gallery-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="lyh_gallery-page">
+    <header class="lyh_gallery-header">
+      <h1 class="lyh_gallery-title">图文列表</h1>
+      <!-- lyh: 顶部显示当前调用的接口地址 -->
+      <div class="lyh_api-bar">
+        <span class="lyh_api-label">当前接口：</span>
+        <span class="lyh_api-url" id="lyh_apiUrl">加载中…</span>
+      </div>
+    </header>
+
+    <!-- lyh: 图文网格容器，由 js/lyh_gallery.js 动态渲染 -->
+    <main class="lyh_gallery-grid" id="lyh_galleryGrid">
+      <div class="lyh_tip" id="lyh_tip">正在加载图文数据…</div>
+    </main>
+
+    <a href="index.html" class="lyh_back">← 返回首页</a>
+  </div>
+
+  <script src="js/lyh_gallery.js"></script>
+</body>
+</html>

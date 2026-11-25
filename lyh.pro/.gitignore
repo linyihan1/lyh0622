@@ -1,0 +1,23 @@
+# 姓名：林奕含| 学号：24002120622 |
+# 时间：2026-11-20 | 大模型：Trae
+
+# 依赖目录
+node_modules/
+
+# 环境变量（含数据库凭据，禁止提交）
+.env
+backend/.env
+
+# 日志
+logs
+*.log
+npm-debug.log*
+
+# 编辑器/系统临时文件
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Trae 工具生成的截图临时目录
+.screenshots/

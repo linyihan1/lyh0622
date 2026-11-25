@@ -1,0 +1,162 @@
+@charset "utf-8";
+/*
+ * 姓名：林奕含 | 学号：24002120622
+ * 时间：2026-11-25
+ * 大模型：DeepSeek-V4.1-Flash
+ * 说明：项目功能截图汇总页面样式
+ */
+
+:root {
+  --lyh_shot_bg: #eef3fb;
+  --lyh_shot_card: #ffffff;
+  --lyh_shot_blue: #1f63d6;
+  --lyh_shot_blue_light: #4c8ef0;
+  --lyh_shot_text: #1f2a3d;
+  --lyh_shot_text_weak: #7c879c;
+  --lyh_shot_line: #e4ebf6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  background: var(--lyh_shot_bg);
+  color: var(--lyh_shot_text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 顶部标题区 */
+.lyh_shot_head {
+  background: linear-gradient(135deg, #2f7ae0, #164a9f);
+  color: #ffffff;
+}
+
+.lyh_shot_head_inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 26px 24px;
+}
+
+.lyh_shot_title {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.lyh_shot_sub {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+}
+
+.lyh_shot_navs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.lyh_shot_nav {
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 18px;
+  color: #ffffff;
+  font-size: 12px;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.lyh_shot_nav:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* 截图列表 */
+.lyh_shot_main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 26px 24px 10px;
+}
+
+.lyh_shot_card {
+  margin-bottom: 22px;
+  border: 1px solid var(--lyh_shot_line);
+  border-radius: 14px;
+  background: var(--lyh_shot_card);
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.lyh_shot_card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(31, 99, 214, 0.12);
+}
+
+.lyh_shot_link {
+  display: block;
+  background: #f7faff;
+  border-bottom: 1px solid var(--lyh_shot_line);
+}
+
+.lyh_shot_img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.lyh_shot_caption {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px 16px;
+}
+
+.lyh_shot_index {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #e8f0ff;
+  color: var(--lyh_shot_blue);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.lyh_shot_name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.lyh_shot_desc {
+  margin-top: 5px;
+  color: var(--lyh_shot_text_weak);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.lyh_shot_foot {
+  padding: 18px 24px 30px;
+  color: var(--lyh_shot_text_weak);
+  font-size: 12px;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .lyh_shot_head_inner {
+    padding: 20px 16px;
+  }
+
+  .lyh_shot_main {
+    padding: 18px 16px 8px;
+  }
+}

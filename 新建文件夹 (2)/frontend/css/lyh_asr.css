@@ -1,0 +1,465 @@
+@charset "utf-8";
+/*
+ * 姓名：林奕含 | 学号：24002120622
+ * 时间：2026-11-25
+ * 大模型：DeepSeek-V4.1-Flash
+ * 说明：语音识别页面样式
+ */
+
+:root {
+  --lyh_asr_bg: #eef3fb;
+  --lyh_asr_blue: #1f63d6;
+  --lyh_asr_blue_light: #4c8ef0;
+  --lyh_asr_text: #1f2a3d;
+  --lyh_asr_text_weak: #7c879c;
+  --lyh_asr_line: #e4ebf6;
+  --lyh_asr_card: #ffffff;
+  --lyh_asr_red: #e15b5b;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  background: var(--lyh_asr_bg);
+  color: var(--lyh_asr_text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 顶部栏 */
+.lyh_asr_topbar {
+  background: linear-gradient(120deg, #164a9f, #2f7ae0);
+  color: #ffffff;
+}
+
+.lyh_asr_topbar_inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1120px;
+  height: 62px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.lyh_asr_brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lyh_asr_logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lyh_asr_brand_name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.lyh_asr_brand_split {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.lyh_asr_brand_page {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.lyh_asr_navs {
+  display: flex;
+  gap: 16px;
+}
+
+.lyh_asr_nav {
+  color: #dbe8ff;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.lyh_asr_nav:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* 主体布局 */
+.lyh_asr_main {
+  display: grid;
+  grid-template-columns: minmax(0, 460px) minmax(0, 1fr);
+  gap: 20px;
+  max-width: 1120px;
+  margin: 24px auto;
+  padding: 0 24px;
+}
+
+.lyh_asr_panel {
+  padding: 22px;
+  border: 1px solid var(--lyh_asr_line);
+  border-radius: 16px;
+  background: var(--lyh_asr_card);
+  box-shadow: 0 10px 30px rgba(31, 74, 148, 0.06);
+}
+
+.lyh_asr_panel_title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.lyh_asr_panel_desc {
+  margin-top: 6px;
+  color: var(--lyh_asr_text_weak);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* 录音区 */
+.lyh_asr_record {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--lyh_asr_line);
+  border-radius: 12px;
+  background: #f8fbff;
+}
+
+.lyh_asr_record_btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1px solid #d6e5fb;
+  border-radius: 20px;
+  background: #ffffff;
+  color: var(--lyh_asr_blue);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.lyh_asr_record_btn:hover {
+  border-color: var(--lyh_asr_blue_light);
+  background: #eef5ff;
+}
+
+.lyh_asr_record_btn.lyh_asr_recording {
+  border-color: #f2c9c9;
+  background: #fff5f5;
+  color: var(--lyh_asr_red);
+}
+
+.lyh_asr_record_dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--lyh_asr_blue);
+}
+
+.lyh_asr_record_btn.lyh_asr_recording .lyh_asr_record_dot {
+  background: var(--lyh_asr_red);
+  animation: lyh_asr_pulse 1s ease-in-out infinite;
+}
+
+@keyframes lyh_asr_pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.75);
+  }
+}
+
+.lyh_asr_record_timer {
+  color: var(--lyh_asr_text_weak);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 上传区 */
+.lyh_asr_drop {
+  margin-top: 14px;
+  padding: 24px 16px;
+  border: 1.5px dashed #bcd0ee;
+  border-radius: 14px;
+  background: #f7faff;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.lyh_asr_drop:hover,
+.lyh_asr_drop.lyh_asr_drop_hover {
+  border-color: var(--lyh_asr_blue_light);
+  background: #eef5ff;
+}
+
+.lyh_asr_drop_icon {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: #e1ecff;
+  color: var(--lyh_asr_blue);
+  font-size: 20px;
+  line-height: 42px;
+}
+
+.lyh_asr_drop_title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lyh_asr_drop_hint {
+  margin-top: 6px;
+  color: var(--lyh_asr_text_weak);
+  font-size: 12px;
+}
+
+.lyh_asr_player {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.lyh_asr_file_meta {
+  margin-top: 12px;
+  color: var(--lyh_asr_text_weak);
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.lyh_asr_actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.lyh_asr_btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.lyh_asr_btn_primary {
+  flex: 1;
+  border: none;
+  background: var(--lyh_asr_blue);
+  color: #ffffff;
+}
+
+.lyh_asr_btn_primary:hover:not(:disabled) {
+  background: #1a55bd;
+}
+
+.lyh_asr_btn_primary:disabled {
+  background: #a9c0e6;
+  cursor: not-allowed;
+}
+
+.lyh_asr_btn_ghost {
+  border: 1px solid var(--lyh_asr_line);
+  background: #ffffff;
+  color: var(--lyh_asr_text);
+}
+
+.lyh_asr_btn_ghost:hover {
+  border-color: var(--lyh_asr_blue_light);
+  color: var(--lyh_asr_blue);
+}
+
+/* 结果区 */
+.lyh_asr_result_panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.lyh_asr_result_head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lyh_asr_model {
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #eef4ff;
+  color: var(--lyh_asr_blue);
+  font-size: 11px;
+}
+
+.lyh_asr_result {
+  flex: 1;
+  min-height: 300px;
+  margin-top: 16px;
+}
+
+.lyh_asr_result_empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 300px;
+  padding: 20px;
+  border: 1px dashed var(--lyh_asr_line);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.lyh_asr_result_badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #2f7ae0, #164a9f);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.lyh_asr_result_empty_title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.lyh_asr_result_empty_desc {
+  margin-top: 8px;
+  max-width: 380px;
+  color: var(--lyh_asr_text_weak);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.lyh_asr_result_body {
+  padding: 18px;
+  border: 1px solid var(--lyh_asr_line);
+  border-radius: 14px;
+  background: #fbfdff;
+}
+
+.lyh_asr_result_text {
+  font-size: 15px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.lyh_asr_result_meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--lyh_asr_line);
+}
+
+.lyh_asr_meta_item {
+  padding: 3px 9px;
+  border-radius: 12px;
+  background: #eef4ff;
+  color: #4a6a9a;
+  font-size: 11px;
+}
+
+.lyh_asr_copy {
+  margin-top: 12px;
+  padding: 7px 16px;
+  border: 1px solid #d6e5fb;
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--lyh_asr_blue);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.lyh_asr_copy:hover {
+  background: #eef5ff;
+}
+
+.lyh_asr_loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--lyh_asr_line);
+  border-radius: 14px;
+  color: var(--lyh_asr_text_weak);
+  font-size: 13px;
+}
+
+.lyh_asr_spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #cfe0fb;
+  border-top-color: var(--lyh_asr_blue);
+  border-radius: 50%;
+  animation: lyh_asr_spin 0.9s linear infinite;
+}
+
+@keyframes lyh_asr_spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lyh_asr_error {
+  padding: 16px;
+  border: 1px solid #f0d6d5;
+  border-radius: 14px;
+  background: #fff6f6;
+  color: #d9534f;
+  font-size: 13px;
+  line-height: 1.7;
+  word-break: break-all;
+}
+
+.lyh_asr_tip {
+  margin-top: 14px;
+  color: var(--lyh_asr_text_weak);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* 窄屏适配 */
+@media (max-width: 860px) {
+  .lyh_asr_main {
+    grid-template-columns: 1fr;
+    margin: 16px auto;
+    padding: 0 16px;
+  }
+
+  .lyh_asr_topbar_inner {
+    padding: 0 16px;
+  }
+
+  .lyh_asr_navs {
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}

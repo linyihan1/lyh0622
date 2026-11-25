@@ -1,0 +1,522 @@
+@charset "utf-8";
+/*
+ * 姓名：林奕含 | 学号：24002120622
+ * 时间：2026-11-25
+ * 大模型：DeepSeek-V4.1-Flash
+ * 说明：在线客服页面样式
+ */
+
+:root {
+  --lyh_cs_bg: #eef3fb;
+  --lyh_cs_blue: #1f63d6;
+  --lyh_cs_blue_light: #4c8ef0;
+  --lyh_cs_text: #1f2a3d;
+  --lyh_cs_text_weak: #7c879c;
+  --lyh_cs_line: #e4ebf6;
+  --lyh_cs_card: #ffffff;
+  --lyh_cs_bubble: #f2f6fd;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  background: var(--lyh_cs_bg);
+  color: var(--lyh_cs_text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.lyh_cs_page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* 顶部品牌栏 */
+.lyh_cs_topbar {
+  flex: none;
+  background: linear-gradient(120deg, #164a9f, #2f7ae0);
+  color: #ffffff;
+}
+
+.lyh_cs_topbar_inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1180px;
+  height: 62px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.lyh_cs_brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lyh_cs_brand_logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.lyh_cs_brand_name {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.lyh_cs_brand_split {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.lyh_cs_brand_page {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.lyh_cs_topbar_info {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* 主体 */
+.lyh_cs_main {
+  display: flex;
+  flex: 1;
+  gap: 18px;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 24px 22px;
+  min-height: 0;
+}
+
+/* 左侧常见问题 */
+.lyh_cs_aside {
+  display: flex;
+  flex-direction: column;
+  width: 268px;
+  flex: none;
+  padding: 22px 18px;
+  border-radius: 16px;
+  background: var(--lyh_cs_card);
+  box-shadow: 0 10px 30px rgba(28, 62, 122, 0.07);
+}
+
+.lyh_cs_aside_title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.lyh_cs_aside_desc {
+  margin: 6px 0 16px;
+  font-size: 12px;
+  color: var(--lyh_cs_text_weak);
+}
+
+.lyh_cs_faq_list {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.lyh_cs_faq_item {
+  position: relative;
+  margin-bottom: 8px;
+  padding: 12px 12px 12px 30px;
+  border: 1px solid var(--lyh_cs_line);
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #3c4a63;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.lyh_cs_faq_item::before {
+  content: "Q";
+  position: absolute;
+  left: 11px;
+  top: 12px;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: #e8f0ff;
+  color: var(--lyh_cs_blue);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+}
+
+.lyh_cs_faq_item:hover {
+  border-color: #b7cdf5;
+  background: #f5f9ff;
+  color: var(--lyh_cs_blue);
+}
+
+.lyh_cs_faq_empty {
+  padding: 12px 4px;
+  font-size: 12px;
+  color: var(--lyh_cs_text_weak);
+}
+
+.lyh_cs_aside_tip {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f4f8ff;
+}
+
+.lyh_cs_aside_tip_title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2c4f8f;
+}
+
+.lyh_cs_aside_tip_text {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--lyh_cs_text_weak);
+}
+
+/* 右侧对话区 */
+.lyh_cs_chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  border-radius: 16px;
+  background: var(--lyh_cs_card);
+  box-shadow: 0 10px 30px rgba(28, 62, 122, 0.07);
+}
+
+.lyh_cs_chat_head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--lyh_cs_line);
+}
+
+.lyh_cs_agent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lyh_cs_agent_avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2f7ae0, #6aa7f5);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 6px 14px rgba(47, 122, 224, 0.3);
+}
+
+.lyh_cs_agent_name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.lyh_cs_agent_tag {
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #e8f1ff;
+  color: var(--lyh_cs_blue);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.lyh_cs_agent_status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--lyh_cs_text_weak);
+}
+
+.lyh_cs_online_dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2fbf71;
+  box-shadow: 0 0 0 3px rgba(47, 191, 113, 0.16);
+}
+
+.lyh_cs_end_btn {
+  padding: 7px 14px;
+  border: 1px solid var(--lyh_cs_line);
+  border-radius: 9px;
+  background: #ffffff;
+  color: #5b6b85;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.lyh_cs_end_btn:hover {
+  border-color: #f0c2c2;
+  color: #c65a5a;
+}
+
+/* 消息列表 */
+.lyh_cs_messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 22px 8px;
+}
+
+.lyh_cs_messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lyh_cs_messages::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background: #d9e4f5;
+}
+
+.lyh_cs_row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.lyh_cs_row.lyh_cs_user_row {
+  flex-direction: row-reverse;
+}
+
+.lyh_cs_bubble_avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2f7ae0, #6aa7f5);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lyh_cs_row.lyh_cs_user_row .lyh_cs_bubble_avatar {
+  background: #e8eef9;
+  color: #5a6d8c;
+}
+
+.lyh_cs_bubble {
+  max-width: calc(100% - 56px);
+  padding: 12px 15px;
+  border-radius: 12px;
+  border-top-left-radius: 4px;
+  background: var(--lyh_cs_bubble);
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.lyh_cs_bubble p + p {
+  margin-top: 4px;
+}
+
+.lyh_cs_row.lyh_cs_user_row .lyh_cs_bubble {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 4px;
+  background: linear-gradient(135deg, #2f7ae0, #5b9bf0);
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(47, 122, 224, 0.24);
+}
+
+.lyh_cs_bubble.lyh_cs_error {
+  background: #fdf1f1;
+  color: #b94a4a;
+}
+
+.lyh_cs_bubble .lyh_cs_inline_code {
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: rgba(31, 99, 214, 0.09);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13px;
+  color: #2456b8;
+}
+
+.lyh_cs_cursor::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 14px;
+  margin-left: 2px;
+  vertical-align: -2px;
+  border-radius: 2px;
+  background: var(--lyh_cs_blue);
+  animation: lyh_cs_blink 1s steps(1) infinite;
+}
+
+@keyframes lyh_cs_blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 快捷问题 */
+.lyh_cs_quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 22px 0;
+}
+
+.lyh_cs_quick_item {
+  padding: 7px 12px;
+  border: 1px solid #dbe6f8;
+  border-radius: 999px;
+  background: #f7faff;
+  color: #3f5f92;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.lyh_cs_quick_item:hover {
+  border-color: #b7cdf5;
+  background: #eef5ff;
+}
+
+/* 输入区 */
+.lyh_cs_composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin: 12px 22px 0;
+  padding: 10px 10px 10px 14px;
+  border: 1px solid var(--lyh_cs_line);
+  border-radius: 14px;
+  background: #fafcff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lyh_cs_composer.lyh_cs_focus {
+  border-color: #adc8f5;
+  box-shadow: 0 0 0 4px rgba(47, 122, 224, 0.09);
+}
+
+.lyh_cs_input {
+  flex: 1;
+  max-height: 120px;
+  padding: 7px 0;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--lyh_cs_text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.lyh_cs_input::placeholder {
+  color: #9aa7bd;
+}
+
+.lyh_cs_send {
+  flex: none;
+  height: 36px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2f7ae0, #5b9bf0);
+  color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.lyh_cs_send:hover {
+  opacity: 0.92;
+}
+
+.lyh_cs_send:active {
+  transform: scale(0.97);
+}
+
+.lyh_cs_send:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.lyh_cs_footnote {
+  padding: 8px 0 12px;
+  font-size: 11px;
+  color: #a6b1c4;
+  text-align: center;
+}
+
+/* 响应式 */
+@media (max-width: 760px) {
+  .lyh_cs_topbar_info {
+    display: none;
+  }
+
+  .lyh_cs_main {
+    padding: 12px;
+  }
+
+  .lyh_cs_aside {
+    display: none;
+  }
+
+  .lyh_cs_chat {
+    border-radius: 14px;
+  }
+
+  .lyh_cs_messages {
+    padding: 16px 14px 6px;
+  }
+
+  .lyh_cs_quick {
+    padding: 8px 14px 0;
+  }
+
+  .lyh_cs_composer {
+    margin: 10px 14px 0;
+  }
+
+  .lyh_cs_chat_head {
+    padding: 12px 14px;
+  }
+}

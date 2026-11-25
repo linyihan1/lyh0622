@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!--
+  姓名：林奕含 | 学号：24002120622
+  时间：2026-11-25
+  大模型：DeepSeek-V4.1-Flash
+  说明：图像识别页面（上传图片，返回图片描述）
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>图像识别 | 林奕含</title>
+  <link rel="stylesheet" href="css/lyh_image.css" />
+</head>
+<body>
+  <div class="lyh_img_page">
+    <header class="lyh_img_topbar">
+      <div class="lyh_img_topbar_inner">
+        <div class="lyh_img_brand">
+          <span class="lyh_img_logo">AI</span>
+          <span class="lyh_img_brand_name">图像识别</span>
+          <span class="lyh_img_brand_split"></span>
+          <span class="lyh_img_brand_page">图片描述生成</span>
+        </div>
+        <nav class="lyh_img_navs">
+          <a class="lyh_img_nav" href="index.html">AI 聊天</a>
+          <a class="lyh_img_nav" href="kb.html">知识库问答</a>
+          <a class="lyh_img_nav" href="service.html">在线客服</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="lyh_img_main">
+      <!-- 左侧：上传区 -->
+      <section class="lyh_img_panel lyh_img_upload_panel">
+        <h2 class="lyh_img_panel_title">上传图片</h2>
+        <p class="lyh_img_panel_desc">支持 jpg / png / gif / webp / bmp，单张不超过 10MB</p>
+
+        <div class="lyh_img_drop" id="lyh_img_drop">
+          <input type="file" id="lyh_img_file" accept="image/jpeg,image/png,image/gif,image/webp,image/bmp" hidden />
+          <div class="lyh_img_drop_placeholder" id="lyh_img_placeholder">
+            <p class="lyh_img_drop_icon">+</p>
+            <p class="lyh_img_drop_title">点击或拖拽图片到此处</p>
+            <p class="lyh_img_drop_hint">上传后点击“开始识别”，由大模型生成描述</p>
+          </div>
+          <img class="lyh_img_preview" id="lyh_img_preview" alt="待识别图片预览" />
+        </div>
+
+        <div class="lyh_img_file_meta" id="lyh_img_meta">尚未选择图片</div>
+
+        <div class="lyh_img_actions">
+          <button class="lyh_img_btn lyh_img_btn_primary" id="lyh_img_submit" type="button" disabled>开始识别</button>
+          <button class="lyh_img_btn lyh_img_btn_ghost" id="lyh_img_reset" type="button">重新选择</button>
+        </div>
+      </section>
+
+      <!-- 右侧：识别结果 -->
+      <section class="lyh_img_panel lyh_img_result_panel">
+        <div class="lyh_img_result_head">
+          <h2 class="lyh_img_panel_title">识别结果</h2>
+          <span class="lyh_img_model" id="lyh_img_model">deepseek-ai/DeepSeek-V4.1-Flash</span>
+        </div>
+
+        <div class="lyh_img_result" id="lyh_img_result">
+          <div class="lyh_img_result_empty">
+            <div class="lyh_img_result_badge">AI</div>
+            <p class="lyh_img_result_empty_title">图片描述将显示在这里</p>
+            <p class="lyh_img_result_empty_desc">上传图片并点击“开始识别”，即可获得图片主题、画面元素和文字内容的中文描述。</p>
+          </div>
+        </div>
+
+        <p class="lyh_img_tip">识别结果由 AI 生成，可能存在偏差；发送给大模型与接收自大模型的数据会输出到浏览器控制台。</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/lyh_image.js"></script>
+</body>
+</html>

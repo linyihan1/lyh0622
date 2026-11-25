@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!--
+  姓名：林奕含| 学号：24002120622 |
+  时间：2026-11-20 | 大模型：Trae
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>奕采 · 课程作品集</title>
+  <link rel="stylesheet" href="css/lyh_style.css">
+</head>
+<body>
+  <!-- lyh: canvas 背景动画画布，全屏固定在最底层 -->
+  <canvas id="lyh_bgCanvas" class="lyh_bg-canvas"></canvas>
+
+  <div class="lyh_page">
+    <header class="lyh_header">
+      <div class="lyh_header-inner">
+        <div class="lyh_brand">
+          <span class="lyh_logo">LYH</span>
+          <div class="lyh_brand-text">
+            <h1 class="lyh_title">奕采 · 课程作品集</h1>
+            <p class="lyh_subtitle">Course Portfolio Navigation</p>
+          </div>
+        </div>
+        <span class="lyh_badge">项目类别：自选</span>
+      </div>
+    </header>
+
+    <main class="lyh_main">
+      <!-- lyh: 个人信息卡片 -->
+      <section class="lyh_profile-card">
+        <div class="lyh_avatar">奕</div>
+        <div class="lyh_profile-info">
+          <div class="lyh_profile-row">
+            <span class="lyh_label">姓名</span>
+            <span class="lyh_value">林奕含</span>
+          </div>
+          <div class="lyh_profile-row">
+            <span class="lyh_label">学号</span>
+            <span class="lyh_value">24002120622</span>
+          </div>
+        </div>
+        <div class="lyh_status" id="lyh_status">服务状态：检测中…</div>
+      </section>
+
+      <!-- lyh: 页面链接导航主体 -->
+      <section class="lyh_nav-section">
+        <h2 class="lyh_section-title">
+          <span class="lyh_section-bar"></span>页面导航
+          <span class="lyh_section-tip">所有已完成页面的入口</span>
+        </h2>
+        <div class="lyh_nav-grid" id="lyh_navGrid">
+          <!-- lyh: 已完成页面入口由 js/lyh_main.js 动态渲染 -->
+        </div>
+      </section>
+    </main>
+
+    <footer class="lyh_footer">
+      <p>© 2026 林奕含 · 课程作业作品展示</p>
+    </footer>
+  </div>
+
+  <script src="js/lyh_main.js"></script>
+</body>
+</html>

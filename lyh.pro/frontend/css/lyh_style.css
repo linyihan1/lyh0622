@@ -1,0 +1,352 @@
+/*
+ * 姓名：林奕含| 学号：24002120622 |
+ * 时间：2026-11-20 | 大模型：Trae
+ */
+/* lyh: 全局重置与基础变量 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --lyh-bg-1: #0f0c29;
+  --lyh-bg-2: #302b63;
+  --lyh-bg-3: #24243e;
+  --lyh-card: rgba(255, 255, 255, 0.06);
+  --lyh-card-border: rgba(255, 255, 255, 0.15);
+  --lyh-text: #e8eaf6;
+  --lyh-text-dim: #a5a8c7;
+  --lyh-accent: #6a5cff;
+  --lyh-accent-2: #00e0ff;
+  --lyh-success: #3ddc97;
+  --lyh-radius: 16px;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: "Microsoft YaHei", "PingFang SC", -apple-system, sans-serif;
+  color: var(--lyh-text);
+  /* lyh: 深色渐变底，canvas 粒子叠加在上方 */
+  background: linear-gradient(135deg, var(--lyh-bg-1), var(--lyh-bg-2), var(--lyh-bg-3));
+  background-attachment: fixed;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* lyh: 全屏 canvas 背景动画 */
+.lyh_bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.lyh_page {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* lyh: 顶部头部 */
+.lyh_header {
+  margin-bottom: 36px;
+}
+
+.lyh_header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.lyh_brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lyh_logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--lyh-accent), var(--lyh-accent-2));
+  box-shadow: 0 8px 24px rgba(106, 92, 255, 0.45);
+}
+
+.lyh_title {
+  font-size: 30px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #fff, var(--lyh-accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.lyh_subtitle {
+  font-size: 13px;
+  color: var(--lyh-text-dim);
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+
+.lyh_badge {
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  color: var(--lyh-accent-2);
+  background: rgba(0, 224, 255, 0.1);
+  border: 1px solid rgba(0, 224, 255, 0.35);
+}
+
+.lyh_main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+/* lyh: 个人信息卡片 */
+.lyh_profile-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 24px 28px;
+  border-radius: var(--lyh-radius);
+  background: var(--lyh-card);
+  border: 1px solid var(--lyh-card-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.lyh_avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--lyh-accent-2), var(--lyh-accent));
+  flex-shrink: 0;
+}
+
+.lyh_profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 180px;
+}
+
+.lyh_profile-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.lyh_label {
+  font-size: 13px;
+  color: var(--lyh-text-dim);
+  min-width: 36px;
+}
+
+.lyh_value {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.lyh_status {
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--lyh-text-dim);
+}
+
+.lyh_status.lyh_online {
+  color: var(--lyh-success);
+  background: rgba(61, 220, 151, 0.12);
+}
+
+.lyh_status.lyh_offline {
+  color: #ff7b7b;
+  background: rgba(255, 123, 123, 0.12);
+}
+
+/* lyh: 导航区块标题 */
+.lyh_section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.lyh_section-bar {
+  width: 4px;
+  height: 20px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--lyh-accent), var(--lyh-accent-2));
+}
+
+.lyh_section-tip {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--lyh-text-dim);
+}
+
+/* lyh: 导航卡片网格 */
+.lyh_nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.lyh_nav-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+  border-radius: var(--lyh-radius);
+  background: var(--lyh-card);
+  border: 1px solid var(--lyh-card-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  text-decoration: none;
+  color: var(--lyh-text);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.lyh_nav-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(106, 92, 255, 0.15), transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.lyh_nav-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0, 224, 255, 0.5);
+  box-shadow: 0 14px 34px rgba(106, 92, 255, 0.3);
+}
+
+.lyh_nav-card:hover::before {
+  opacity: 1;
+}
+
+.lyh_nav-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.lyh_card-icon {
+  font-size: 28px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  margin-bottom: 4px;
+}
+
+.lyh_card-title {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.lyh_card-desc {
+  font-size: 13px;
+  color: var(--lyh-text-dim);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.lyh_card-link {
+  font-size: 13px;
+  color: var(--lyh-accent-2);
+  margin-top: 4px;
+}
+
+/* lyh: 未完成（占位）卡片 */
+.lyh_nav-card.lyh_disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.lyh_nav-card.lyh_disabled:hover {
+  transform: none;
+  border-color: var(--lyh-card-border);
+  box-shadow: none;
+}
+
+.lyh_card-tag {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(0, 224, 255, 0.15);
+  color: var(--lyh-accent-2);
+  z-index: 1;
+}
+
+.lyh_nav-card.lyh_disabled .lyh_card-tag {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--lyh-text-dim);
+}
+
+/* lyh: 页脚 */
+.lyh_footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--lyh-text-dim);
+  padding-top: 20px;
+  border-top: 1px solid var(--lyh-card-border);
+}
+
+/* lyh: 响应式 */
+@media (max-width: 600px) {
+  .lyh_title {
+    font-size: 22px;
+  }
+  .lyh_page {
+    padding: 24px 16px 40px;
+  }
+  .lyh_profile-card {
+    padding: 18px;
+  }
+}

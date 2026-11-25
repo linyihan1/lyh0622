@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!--
+  姓名：林奕含 | 学号：24002120622
+  时间：2026-11-25
+  大模型：DeepSeek-V4.1-Flash
+  说明：云书商城在线客服页面（硅基流动大模型）
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>在线客服 | 云书商城</title>
+  <link rel="stylesheet" href="css/lyh_service.css" />
+</head>
+<body>
+  <div class="lyh_cs_page">
+    <!-- 顶部品牌栏 -->
+    <header class="lyh_cs_topbar">
+      <div class="lyh_cs_topbar_inner">
+        <div class="lyh_cs_brand">
+          <span class="lyh_cs_brand_logo">云</span>
+          <span class="lyh_cs_brand_name">云书商城</span>
+          <span class="lyh_cs_brand_split"></span>
+          <span class="lyh_cs_brand_page">在线客服</span>
+        </div>
+        <div class="lyh_cs_topbar_info">
+          <span class="lyh_cs_topbar_item">服务时间 09:00 - 22:00</span>
+          <span class="lyh_cs_topbar_item">客服热线 400-808-6688</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 客服主体 -->
+    <main class="lyh_cs_main">
+      <!-- 左侧常见问题 -->
+      <aside class="lyh_cs_aside">
+        <h2 class="lyh_cs_aside_title">常见问题</h2>
+        <p class="lyh_cs_aside_desc">点击问题即可快速咨询</p>
+        <ul class="lyh_cs_faq_list" id="lyh_cs_faqList"></ul>
+        <div class="lyh_cs_aside_tip">
+          <p class="lyh_cs_aside_tip_title">需要人工服务？</p>
+          <p class="lyh_cs_aside_tip_text">拨打 400-808-6688，或直接在对话框说明“转人工”。</p>
+        </div>
+      </aside>
+
+      <!-- 右侧对话区 -->
+      <section class="lyh_cs_chat">
+        <header class="lyh_cs_chat_head">
+          <div class="lyh_cs_agent">
+            <div class="lyh_cs_agent_avatar">云</div>
+            <div class="lyh_cs_agent_info">
+              <p class="lyh_cs_agent_name">客服小云 <span class="lyh_cs_agent_tag">AI</span></p>
+              <p class="lyh_cs_agent_status"><span class="lyh_cs_online_dot"></span>在线 · 平均 1 秒响应</p>
+            </div>
+          </div>
+          <button class="lyh_cs_end_btn" id="lyh_cs_endBtn" type="button">结束会话</button>
+        </header>
+
+        <div class="lyh_cs_messages" id="lyh_cs_messages">
+          <div class="lyh_cs_row lyh_cs_agent_row">
+            <div class="lyh_cs_bubble_avatar">云</div>
+            <div class="lyh_cs_bubble">
+              <p>您好，我是云书商城的客服小云，很高兴为您服务～</p>
+              <p>订单、物流、退换货、优惠券等问题都可以问我。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="lyh_cs_quick" id="lyh_cs_quick">
+          <button class="lyh_cs_quick_item" type="button" data-lyh-q="我的订单什么时候发货？">查询发货时间</button>
+          <button class="lyh_cs_quick_item" type="button" data-lyh-q="图书支持七天无理由退换吗？">退换货政策</button>
+          <button class="lyh_cs_quick_item" type="button" data-lyh-q="优惠券可以叠加使用吗？">优惠券使用</button>
+          <button class="lyh_cs_quick_item" type="button" data-lyh-q="怎么开具发票？">开具发票</button>
+        </div>
+
+        <footer class="lyh_cs_composer">
+          <textarea
+            class="lyh_cs_input"
+            id="lyh_cs_input"
+            rows="1"
+            maxlength="1000"
+            placeholder="请描述您遇到的问题，Enter 发送，Shift + Enter 换行"
+          ></textarea>
+          <button class="lyh_cs_send" id="lyh_cs_send" type="button">发送</button>
+        </footer>
+        <p class="lyh_cs_footnote">本页面由 AI 提供咨询服务，重要信息请以人工客服确认为准</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/lyh_service.js"></script>
+</body>
+</html>
