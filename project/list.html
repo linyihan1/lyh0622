@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>品牌特卖 · 唯品会</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- lyh: 顶部工具条 -->
+  <div class="lyh_topbar">
+    <div class="lyh_container lyh_topbar__inner">
+      <span>唯品会 · 正品特卖 · 7 天无理由退货</span>
+      <nav class="lyh_topbar__links">
+        <a href="#">我的订单</a>
+        <a href="#">会员中心</a>
+        <a href="#">客户服务</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- lyh: 头部搜索 -->
+  <header class="lyh_header">
+    <div class="lyh_container lyh_header__inner">
+      <a class="lyh_logo" href="index.html">
+        <span class="lyh_logo__mark">唯品会</span>
+        <span class="lyh_logo__slogan">品牌特卖</span>
+      </a>
+      <form class="lyh_search" id="lyh_searchForm">
+        <input class="lyh_search__input" id="lyh_searchInput" type="search" placeholder="搜索商品、品牌，如 羽绒服 / 兰蔻" autocomplete="off">
+        <button class="lyh_search__btn" type="submit">搜索</button>
+      </form>
+      <a class="lyh_cart" href="list.html">
+        购物车
+        <span class="lyh_cart__dot">0</span>
+      </a>
+    </div>
+    <nav class="lyh_nav">
+      <div class="lyh_container lyh_nav__inner">
+        <a class="lyh_nav__item" href="index.html">首页</a>
+        <a class="lyh_nav__item lyh_nav__item--active" href="list.html">品牌特卖</a>
+        <a class="lyh_nav__item" href="list.html?sort=sales_count.desc">人气榜单</a>
+        <a class="lyh_nav__item" href="index.html#lyh_flash">限时抢购</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="lyh_container">
+      <div class="lyh_crumb">
+        <a href="index.html">首页</a> / <span>品牌特卖</span>
+      </div>
+
+      <!-- lyh: 筛选区 -->
+      <section class="lyh_filter">
+        <div class="lyh_filter__row" id="lyh_categoryRow">
+          <span class="lyh_filter__label">品类</span>
+          <button class="lyh_chip lyh_chip--active" type="button" data-lyh-category="">全部</button>
+          <button class="lyh_chip" type="button" data-lyh-category="服饰">服饰</button>
+          <button class="lyh_chip" type="button" data-lyh-category="美妆">美妆</button>
+          <button class="lyh_chip" type="button" data-lyh-category="运动">运动</button>
+          <button class="lyh_chip" type="button" data-lyh-category="鞋包">鞋包</button>
+          <button class="lyh_chip" type="button" data-lyh-category="家电">家电</button>
+        </div>
+        <div class="lyh_filter__row" id="lyh_sortRow">
+          <span class="lyh_filter__label">排序</span>
+          <button class="lyh_chip lyh_chip--active" type="button" data-lyh-sort="sales_count.desc">销量优先</button>
+          <button class="lyh_chip" type="button" data-lyh-sort="sale_price.asc">价格从低到高</button>
+          <button class="lyh_chip" type="button" data-lyh-sort="sale_price.desc">价格从高到低</button>
+          <button class="lyh_chip" type="button" data-lyh-sort="discount.asc">折扣最低</button>
+        </div>
+      </section>
+
+      <div class="lyh_list-meta">
+        <span id="lyh_listSummary">正在加载商品…</span>
+        <span>全场正品 · 支持 7 天无理由退货</span>
+      </div>
+
+      <!-- lyh: 商品列表 -->
+      <div class="lyh_product-grid" id="lyh_productGrid">
+        <div class="lyh_skeleton"></div>
+        <div class="lyh_skeleton"></div>
+        <div class="lyh_skeleton"></div>
+        <div class="lyh_skeleton"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- lyh: 页脚 -->
+  <footer class="lyh_footer">
+    <div class="lyh_container">
+      <div class="lyh_footer__cols">
+        <div>
+          <h4>购物指南</h4>
+          <ul>
+            <li><a href="#">购物流程</a></li>
+            <li><a href="#">会员介绍</a></li>
+            <li><a href="#">常见问题</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>配送方式</h4>
+          <ul>
+            <li><a href="#">上门自提</a></li>
+            <li><a href="#">配送服务查询</a></li>
+            <li><a href="#">配送费收取标准</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>支付方式</h4>
+          <ul>
+            <li><a href="#">在线支付</a></li>
+            <li><a href="#">分期付款</a></li>
+            <li><a href="#">发票说明</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>售后服务</h4>
+          <ul>
+            <li><a href="#">售后政策</a></li>
+            <li><a href="#">价格保护</a></li>
+            <li><a href="#">退款说明</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="lyh_footer__copy">© 2026 唯品会特卖站 · 课程作业演示页面 · 商品数据来自 Supabase</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/list.js"></script>
+</body>
+</html>

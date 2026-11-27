@@ -1,0 +1,148 @@
+<!--
+  lyh_唯品会评论情感分类 · 前端首页
+  作者：林奕含 / 学号：24002120622
+  时间：2026-11-25
+  模型：deepseek-ai/DeepSeek-V4-Flash（硅基流动）
+  功能：Harness Engineering · 评论情感三分类 + 维度 + 实体 + 摘要 + 复核标记
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>唯品会评论情感分析 · LLM 应用设计</title>
+  <link rel="stylesheet" href="css/lyh_style.css">
+</head>
+<body>
+
+  <!-- lyh_顶部标题区 -->
+  <header class="lyh-header">
+    <div class="lyh-brand">
+      <span class="lyh-brand-logo">V</span>
+      <div class="lyh-brand-text">
+        <h1>唯品会 · 评论情感分析</h1>
+        <p class="lyh-brand-sub">Harness Engineering · 大模型 JSON 结构化输出</p>
+      </div>
+    </div>
+    <div class="lyh-status">
+      <span id="lyh_status_dot" class="lyh-dot lyh-dot-ok"></span>
+      <span id="lyh_status_text">检测连接中...</span>
+    </div>
+  </header>
+
+  <main class="lyh-main">
+
+    <!-- lyh_左侧：评论输入区 -->
+    <section class="lyh-panel lyh-input-panel">
+      <h2 class="lyh-panel-title">📝 输入一条唯品会商品评论</h2>
+      <textarea id="lyh_comment" class="lyh-textarea" maxlength="500"
+        placeholder="粘贴一条唯品会商品评论，例如：物流很快第二天就到了，包装很精美，衣服面料舒服，就是领口有点大..."></textarea>
+
+      <div class="lyh-actions">
+        <span class="lyh-counter"><span id="lyh_count">0</span>/500</span>
+        <div class="lyh-btns">
+          <button id="lyh_btn_clear" class="lyh-btn lyh-btn-ghost">清空</button>
+          <button id="lyh_btn_submit" class="lyh-btn lyh-btn-primary">
+            <span id="lyh_btn_text">🔍 一键分析</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- lyh_快速示例：点一下自动填入 -->
+      <div class="lyh-samples">
+        <span class="lyh-samples-label">💡 试试示例：</span>
+        <button class="lyh-sample" data-sample="positive">物流很快第二天就到了，包装也很精美，衣服面料摸着很舒服，就是领口有点大不太满意。</button>
+        <button class="lyh-sample" data-sample="neutral">唯品会买的欧莱雅复颜玻尿酸精华，用了一周感觉皮肤没什么变化，价格倒是挺便宜的。</button>
+        <button class="lyh-sample" data-sample="negative">鞋子刚穿第一天就开胶了，客服态度还特别差，再也不在唯品会买鞋了！</button>
+        <button class="lyh-sample" data-sample="unknown">真的假的？这个价格能买到正品吗？</button>
+      </div>
+    </section>
+
+    <!-- lyh_右侧：分析结果卡片 -->
+    <section class="lyh-panel lyh-result-panel">
+      <h2 class="lyh-panel-title">🎯 结构化分析结果</h2>
+
+      <!-- lyh_加载状态 -->
+      <div id="lyh_loading" class="lyh-loading hidden">
+        <div class="lyh-spinner"></div>
+        <p>大模型正在分析...</p>
+      </div>
+
+      <!-- lyh_空状态 -->
+      <div id="lyh_empty" class="lyh-empty">
+        <div class="lyh-empty-icon">🤖</div>
+        <p>在左侧输入评论，点"一键分析"即可看到结构化情感结果</p>
+      </div>
+
+      <!-- lyh_结果卡片 -->
+      <div id="lyh_result" class="lyh-result hidden">
+
+        <!-- 原始评论 -->
+        <div class="lyh-comment-box">
+          <span class="lyh-comment-label">📌 评论原文</span>
+          <p id="lyh_original_comment"></p>
+        </div>
+
+        <!-- sentiment 主卡 -->
+        <div class="lyh-sentiment-card" id="lyh_sentiment_card">
+          <div class="lyh-sentiment-main">
+            <div class="lyh-sentiment-icon" id="lyh_sentiment_icon">😊</div>
+            <div class="lyh-sentiment-info">
+              <div class="lyh-sentiment-label" id="lyh_sentiment_label">正面</div>
+              <div class="lyh-sentiment-bar">
+                <div class="lyh-sentiment-fill" id="lyh_sentiment_fill"></div>
+              </div>
+              <div class="lyh-confidence">置信度 <span id="lyh_confidence_val">--</span></div>
+            </div>
+          </div>
+          <div class="lyh-rev-badge hidden" id="lyh_rev_badge">⚠️ 建议人工复核</div>
+        </div>
+
+        <!-- aspects 维度标签 -->
+        <div class="lyh-field">
+          <div class="lyh-field-label">🏷️ 评论维度</div>
+          <div class="lyh-tags" id="lyh_aspects"></div>
+        </div>
+
+        <!-- entities 实体 -->
+        <div class="lyh-field">
+          <div class="lyh-field-label">🔍 命名实体</div>
+          <div class="lyh-entities" id="lyh_entities"></div>
+        </div>
+
+        <!-- summary 摘要 -->
+        <div class="lyh-field">
+          <div class="lyh-field-label">📝 一句话摘要</div>
+          <p class="lyh-summary" id="lyh_summary"></p>
+        </div>
+
+        <!-- 原始 JSON 折叠 -->
+        <details class="lyh-json-fold">
+          <summary>🔧 查看原始 JSON 响应</summary>
+          <pre id="lyh_raw_json"></pre>
+        </details>
+
+      </div>
+
+      <!-- lyh_错误提示 -->
+      <div id="lyh_error" class="lyh-error hidden"></div>
+    </section>
+
+    <!-- lyh_底部：历史记录 -->
+    <section class="lyh-panel lyh-history-panel">
+      <h2 class="lyh-panel-title">📜 历史分析记录 <span class="lyh-history-count" id="lyh_history_count">(0)</span></h2>
+      <div class="lyh-history-list" id="lyh_history_list">
+        <p class="lyh-empty-small">暂无历史记录</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="lyh-footer">
+    <p>大连东软信息学院 · 高级网页设计 I · LLM 应用设计实验</p>
+    <p>作者：林奕含 24002120622 · 模型：deepseek-ai/DeepSeek-V4-Flash</p>
+  </footer>
+
+  <script src="js/lyh_main.js"></script>
+</body>
+</html>

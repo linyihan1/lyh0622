@@ -1,0 +1,17 @@
+{
+  "name": "lyh_vipshop_chat",
+  "version": "1.0.0",
+  "description": "唯品会商品评论情感分类 · LLM 应用设计实验（大连东软信息学院 · 高级网页设计 I）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "author": "林奕含 24002120622",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  }
+}

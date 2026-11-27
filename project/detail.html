@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>商品详情 · 唯品会</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- lyh: 顶部工具条 -->
+  <div class="lyh_topbar">
+    <div class="lyh_container lyh_topbar__inner">
+      <span>唯品会 · 正品特卖 · 7 天无理由退货</span>
+      <nav class="lyh_topbar__links">
+        <a href="#">我的订单</a>
+        <a href="#">会员中心</a>
+        <a href="#">客户服务</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- lyh: 头部搜索 -->
+  <header class="lyh_header">
+    <div class="lyh_container lyh_header__inner">
+      <a class="lyh_logo" href="index.html">
+        <span class="lyh_logo__mark">唯品会</span>
+        <span class="lyh_logo__slogan">品牌特卖</span>
+      </a>
+      <form class="lyh_search" id="lyh_searchForm">
+        <input class="lyh_search__input" id="lyh_searchInput" type="search" placeholder="搜索商品、品牌，如 羽绒服 / 兰蔻" autocomplete="off">
+        <button class="lyh_search__btn" type="submit">搜索</button>
+      </form>
+      <a class="lyh_cart" href="list.html">
+        购物车
+        <span class="lyh_cart__dot">0</span>
+      </a>
+    </div>
+    <nav class="lyh_nav">
+      <div class="lyh_container lyh_nav__inner">
+        <a class="lyh_nav__item" href="index.html">首页</a>
+        <a class="lyh_nav__item" href="list.html">品牌特卖</a>
+        <a class="lyh_nav__item" href="list.html?sort=sales_count.desc">人气榜单</a>
+        <a class="lyh_nav__item" href="index.html#lyh_flash">限时抢购</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="lyh_container">
+      <div class="lyh_crumb" id="lyh_crumb">
+        <a href="index.html">首页</a> / <a href="list.html">品牌特卖</a> / <span>商品详情</span>
+      </div>
+
+      <!-- lyh: 商品主信息 -->
+      <section class="lyh_detail" id="lyh_detail">
+        <div class="lyh_detail__media">
+          <img class="lyh_detail__img" id="lyh_detailImg" src="" alt="">
+        </div>
+        <div class="lyh_detail__info">
+          <span class="lyh_detail__brand" id="lyh_detailBrand">加载中…</span>
+          <h1 class="lyh_detail__title" id="lyh_detailTitle">正在加载商品…</h1>
+          <p class="lyh_detail__sub" id="lyh_detailSub"></p>
+
+          <div class="lyh_price-box">
+            <span class="lyh_price-box__now" id="lyh_detailPrice">--</span>
+            <span class="lyh_price-box__origin" id="lyh_detailOrigin"></span>
+            <span class="lyh_tag lyh_tag--pink" id="lyh_detailDiscount"></span>
+          </div>
+
+          <div class="lyh_detail__facts">
+            <div class="lyh_fact"><b id="lyh_detailSales">-</b><span>累计销量</span></div>
+            <div class="lyh_fact"><b id="lyh_detailStock">-</b><span>剩余库存</span></div>
+            <div class="lyh_fact"><b id="lyh_detailCategory">-</b><span>所属品类</span></div>
+          </div>
+
+          <div class="lyh_detail__row">
+            <span>服务</span>
+            <div class="lyh_service">
+              <span class="lyh_tag lyh_tag--pink">正品保证</span>
+              <span class="lyh_tag lyh_tag--pink">7 天无理由退货</span>
+              <span class="lyh_tag lyh_tag--orange">顺丰包邮</span>
+            </div>
+          </div>
+
+          <div class="lyh_detail__row">
+            <span>数量</span>
+            <div class="lyh_qty">
+              <button type="button" id="lyh_qtyMinus">−</button>
+              <input id="lyh_qtyInput" type="text" value="1" inputmode="numeric">
+              <button type="button" id="lyh_qtyPlus">+</button>
+            </div>
+          </div>
+
+          <div class="lyh_detail__actions">
+            <button class="lyh_btn lyh_btn--primary lyh_btn--lg" type="button" id="lyh_buyBtn">立即购买</button>
+            <button class="lyh_btn lyh_btn--outline lyh_btn--lg" type="button" id="lyh_cartBtn">加入购物车</button>
+          </div>
+
+          <div class="lyh_flash-note" id="lyh_flashNote" hidden>
+            <div>
+              <p class="lyh_flash-note__label">限时抢购中</p>
+              <p class="lyh_flash-note__price" id="lyh_flashPrice">--</p>
+            </div>
+            <div>
+              <p class="lyh_flash-note__timer" id="lyh_flashTimer" data-lyh-start="" data-lyh-end="">--</p>
+              <p class="lyh_flash-note__label" id="lyh_flashTitle"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- lyh: 商品参数 -->
+      <section class="lyh_params">
+        <h3>商品参数</h3>
+        <table class="lyh_params__table" id="lyh_paramTable">
+          <tbody>
+            <tr><th>数据加载中</th><td>—</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- lyh: 相关推荐 -->
+      <section class="lyh_section">
+        <div class="lyh_section__head">
+          <div>
+            <h2 class="lyh_section__title">同类<span>好物</span></h2>
+            <p class="lyh_section__sub">买过的用户还看了这些</p>
+          </div>
+          <a class="lyh_section__more" href="list.html">更多 ›</a>
+        </div>
+        <div class="lyh_product-grid" id="lyh_relatedGrid">
+          <div class="lyh_skeleton"></div>
+          <div class="lyh_skeleton"></div>
+          <div class="lyh_skeleton"></div>
+          <div class="lyh_skeleton"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- lyh: 页脚 -->
+  <footer class="lyh_footer">
+    <div class="lyh_container">
+      <div class="lyh_footer__cols">
+        <div>
+          <h4>购物指南</h4>
+          <ul>
+            <li><a href="#">购物流程</a></li>
+            <li><a href="#">会员介绍</a></li>
+            <li><a href="#">常见问题</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>配送方式</h4>
+          <ul>
+            <li><a href="#">上门自提</a></li>
+            <li><a href="#">配送服务查询</a></li>
+            <li><a href="#">配送费收取标准</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>支付方式</h4>
+          <ul>
+            <li><a href="#">在线支付</a></li>
+            <li><a href="#">分期付款</a></li>
+            <li><a href="#">发票说明</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>售后服务</h4>
+          <ul>
+            <li><a href="#">售后政策</a></li>
+            <li><a href="#">价格保护</a></li>
+            <li><a href="#">退款说明</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="lyh_footer__copy">© 2026 唯品会特卖站 · 课程作业演示页面 · 商品数据来自 Supabase</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/detail.js"></script>
+</body>
+</html>

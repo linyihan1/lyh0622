@@ -1,0 +1,290 @@
+/* lyh_唯品会评论情感分类 · 深色主题 CSS
+   唯品会主色：红 #E60012 / 高亮 #FF3B30 */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* lyh_品牌色 */
+  --lyh-red: #E60012;
+  --lyh-red-light: #FF3B30;
+  --lyh-red-glow: rgba(230, 0, 18, .25);
+  /* lyh_深色主题 */
+  --lyh-bg: #0D0D0F;
+  --lyh-panel: #18181C;
+  --lyh-panel-hi: #1F1F24;
+  --lyh-border: #2A2A30;
+  --lyh-text: #E8E8EC;
+  --lyh-text-dim: #8B8B95;
+  --lyh-text-mute: #55555E;
+  /* lyh_情感色 */
+  --lyh-pos: #22C55E;
+  --lyh-neu: #F59E0B;
+  --lyh-neg: #EF4444;
+  /* lyh_布局 */
+  --lyh-radius: 12px;
+}
+
+html, body {
+  font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  background: var(--lyh-bg);
+  color: var(--lyh-text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ══════ Header ══════ */
+.lyh-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 24px 36px;
+  border-bottom: 1px solid var(--lyh-border);
+  background: linear-gradient(180deg, #141418 0%, var(--lyh-bg) 100%);
+}
+.lyh-brand { display: flex; align-items: center; gap: 16px; }
+.lyh-brand-logo {
+  width: 48px; height: 48px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--lyh-red) 0%, var(--lyh-red-light) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; font-weight: 900; color: #fff;
+  box-shadow: 0 4px 16px var(--lyh-red-glow);
+}
+.lyh-brand-text h1 { font-size: 20px; font-weight: 700; letter-spacing: .5px; }
+.lyh-brand-sub { font-size: 12px; color: var(--lyh-text-dim); margin-top: 2px; }
+
+.lyh-status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--lyh-text-dim); }
+.lyh-dot { width: 8px; height: 8px; border-radius: 50%; }
+.lyh-dot-ok { background: var(--lyh-pos); box-shadow: 0 0 8px var(--lyh-pos); }
+.lyh-dot-bad { background: var(--lyh-neg); box-shadow: 0 0 8px var(--lyh-neg); }
+.lyh-dot-wait { background: var(--lyh-neu); box-shadow: 0 0 8px var(--lyh-neu); }
+
+/* ══════ Main Grid ══════ */
+.lyh-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
+  padding: 28px 36px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.lyh-input-panel { grid-column: 1; grid-row: 1; }
+.lyh-result-panel { grid-column: 2; grid-row: 1; }
+.lyh-history-panel { grid-column: 1 / span 2; grid-row: 2; }
+
+.lyh-panel {
+  background: var(--lyh-panel);
+  border: 1px solid var(--lyh-border);
+  border-radius: var(--lyh-radius);
+  padding: 24px;
+}
+.lyh-panel-title {
+  font-size: 15px; font-weight: 600; margin-bottom: 16px;
+  color: var(--lyh-text);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* ══════ 输入区 ══════ */
+.lyh-textarea {
+  width: 100%; min-height: 160px; resize: vertical;
+  background: var(--lyh-bg); border: 1px solid var(--lyh-border);
+  border-radius: 8px; padding: 14px; color: var(--lyh-text);
+  font-size: 14px; line-height: 1.7; font-family: inherit;
+  transition: border .2s, box-shadow .2s;
+}
+.lyh-textarea:focus {
+  outline: none;
+  border-color: var(--lyh-red);
+  box-shadow: 0 0 0 3px var(--lyh-red-glow);
+}
+.lyh-textarea::placeholder { color: var(--lyh-text-mute); }
+
+.lyh-actions {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 12px;
+}
+.lyh-counter { font-size: 12px; color: var(--lyh-text-mute); }
+.lyh-btns { display: flex; gap: 10px; }
+
+.lyh-btn {
+  border: none; border-radius: 8px; padding: 10px 22px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: transform .1s, box-shadow .2s, background .2s;
+  font-family: inherit;
+}
+.lyh-btn:active { transform: scale(.97); }
+.lyh-btn-primary {
+  background: linear-gradient(135deg, var(--lyh-red) 0%, var(--lyh-red-light) 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px var(--lyh-red-glow);
+}
+.lyh-btn-primary:hover { box-shadow: 0 6px 20px var(--lyh-red-glow); }
+.lyh-btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+.lyh-btn-ghost {
+  background: transparent; color: var(--lyh-text-dim);
+  border: 1px solid var(--lyh-border);
+}
+.lyh-btn-ghost:hover { color: var(--lyh-text); border-color: var(--lyh-text-dim); }
+
+/* lyh_示例按钮 */
+.lyh-samples { margin-top: 20px; }
+.lyh-samples-label { font-size: 12px; color: var(--lyh-text-mute); display: block; margin-bottom: 8px; }
+.lyh-sample {
+  display: inline-block; margin: 4px 4px 4px 0;
+  padding: 6px 12px; font-size: 12px;
+  background: var(--lyh-panel-hi); border: 1px solid var(--lyh-border);
+  border-radius: 6px; color: var(--lyh-text-dim); cursor: pointer;
+  transition: all .15s;
+  font-family: inherit;
+}
+.lyh-sample:hover { border-color: var(--lyh-red); color: var(--lyh-red-light); }
+
+/* ══════ 结果区 ══════ */
+.hidden { display: none !important; }
+
+.lyh-empty, .lyh-loading {
+  text-align: center; padding: 60px 20px;
+  color: var(--lyh-text-mute);
+}
+.lyh-empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+.lyh-spinner {
+  width: 36px; height: 36px; margin: 0 auto 16px;
+  border: 3px solid var(--lyh-border);
+  border-top-color: var(--lyh-red);
+  border-radius: 50%;
+  animation: lyh_spin 1s linear infinite;
+}
+@keyframes lyh_spin { to { transform: rotate(360deg); } }
+
+.lyh-comment-box {
+  background: var(--lyh-bg); border: 1px solid var(--lyh-border);
+  border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;
+}
+.lyh-comment-label { font-size: 11px; color: var(--lyh-text-mute); text-transform: uppercase; letter-spacing: 1px; }
+.lyh-comment-box p { font-size: 14px; color: var(--lyh-text); margin-top: 6px; line-height: 1.7; }
+
+/* lyh_sentiment 主卡 */
+.lyh-sentiment-card {
+  border-radius: 10px; padding: 18px 20px;
+  background: linear-gradient(135deg, var(--lyh-panel-hi), var(--lyh-panel));
+  border: 1px solid var(--lyh-border);
+  margin-bottom: 16px; position: relative;
+}
+.lyh-sentiment-card.lyh-pos { border-color: var(--lyh-pos); box-shadow: 0 0 20px rgba(34,197,94,.15); }
+.lyh-sentiment-card.lyh-neu { border-color: var(--lyh-neu); box-shadow: 0 0 20px rgba(245,158,11,.15); }
+.lyh-sentiment-card.lyh-neg { border-color: var(--lyh-neg); box-shadow: 0 0 20px rgba(239,68,68,.15); }
+
+.lyh-sentiment-main { display: flex; align-items: center; gap: 18px; }
+.lyh-sentiment-icon { font-size: 44px; }
+.lyh-sentiment-info { flex: 1; }
+.lyh-sentiment-label { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+.lyh-pos .lyh-sentiment-label { color: var(--lyh-pos); }
+.lyh-neu .lyh-sentiment-label { color: var(--lyh-neu); }
+.lyh-neg .lyh-sentiment-label { color: var(--lyh-neg); }
+
+.lyh-sentiment-bar {
+  height: 6px; background: var(--lyh-bg); border-radius: 3px; overflow: hidden;
+  margin-bottom: 8px;
+}
+.lyh-sentiment-fill {
+  height: 100%; border-radius: 3px; transition: width .6s ease;
+  background: var(--lyh-pos);
+}
+.lyh-pos .lyh-sentiment-fill { background: var(--lyh-pos); }
+.lyh-neu .lyh-sentiment-fill { background: var(--lyh-neu); }
+.lyh-neg .lyh-sentiment-fill { background: var(--lyh-neg); }
+
+.lyh-confidence { font-size: 12px; color: var(--lyh-text-dim); }
+.lyh-confidence span { color: var(--lyh-text); font-weight: 600; }
+
+.lyh-rev-badge {
+  position: absolute; top: 12px; right: 14px;
+  padding: 4px 10px; font-size: 11px;
+  background: rgba(245, 158, 11, .15); color: var(--lyh-neu);
+  border-radius: 12px; font-weight: 600;
+}
+
+/* lyh_通用字段 */
+.lyh-field { margin-bottom: 16px; }
+.lyh-field-label {
+  font-size: 12px; color: var(--lyh-text-dim);
+  margin-bottom: 8px; font-weight: 600;
+}
+.lyh-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.lyh-tag {
+  padding: 4px 12px; font-size: 12px;
+  background: var(--lyh-panel-hi); border: 1px solid var(--lyh-border);
+  border-radius: 20px; color: var(--lyh-text);
+}
+
+.lyh-entities { display: flex; flex-wrap: wrap; gap: 6px; }
+.lyh-entity {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; font-size: 12px;
+  background: rgba(230, 0, 18, .1); border: 1px solid rgba(230, 0, 18, .25);
+  border-radius: 6px;
+}
+.lyh-entity-type {
+  font-size: 10px; color: var(--lyh-text-mute);
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.lyh-summary {
+  font-size: 14px; color: var(--lyh-text);
+  line-height: 1.7; padding: 10px 14px;
+  background: var(--lyh-bg); border-left: 3px solid var(--lyh-red);
+  border-radius: 0 6px 6px 0;
+}
+
+.lyh-json-fold { margin-top: 16px; }
+.lyh-json-fold summary {
+  cursor: pointer; font-size: 12px; color: var(--lyh-text-dim);
+  padding: 6px 0;
+}
+.lyh-json-fold pre {
+  background: var(--lyh-bg); border: 1px solid var(--lyh-border);
+  border-radius: 6px; padding: 12px;
+  font-size: 12px; overflow-x: auto;
+  color: var(--lyh-text-dim);
+}
+
+.lyh-error {
+  padding: 14px 16px; background: rgba(239, 68, 68, .1);
+  border: 1px solid rgba(239, 68, 68, .3);
+  border-radius: 8px; color: var(--lyh-neg); font-size: 13px;
+}
+
+/* ══════ 历史记录 ══════ */
+.lyh-history-count { font-size: 12px; color: var(--lyh-text-mute); font-weight: 400; }
+.lyh-history-list { display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; }
+.lyh-empty-small { font-size: 13px; color: var(--lyh-text-mute); padding: 12px 0; text-align: center; }
+
+.lyh-history-item {
+  display: grid; grid-template-columns: 70px 1fr auto; gap: 14px;
+  align-items: center; padding: 10px 14px;
+  background: var(--lyh-bg); border: 1px solid var(--lyh-border);
+  border-radius: 8px; cursor: pointer;
+  transition: border .15s, background .15s;
+}
+.lyh-history-item:hover { border-color: var(--lyh-red); background: var(--lyh-panel-hi); }
+
+.lyh-hist-sentiment { font-size: 11px; font-weight: 700; text-align: center; padding: 4px 0; border-radius: 4px; }
+.lyh-hist-sentiment.pos { background: rgba(34,197,94,.15); color: var(--lyh-pos); }
+.lyh-hist-sentiment.neu { background: rgba(245,158,11,.15); color: var(--lyh-neu); }
+.lyh-hist-sentiment.neg { background: rgba(239,68,68,.15); color: var(--lyh-neg); }
+
+.lyh-hist-comment { font-size: 13px; color: var(--lyh-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lyh-hist-conf { font-size: 11px; color: var(--lyh-text-mute); }
+
+/* ══════ Footer ══════ */
+.lyh-footer {
+  text-align: center; padding: 24px 36px;
+  border-top: 1px solid var(--lyh-border);
+  color: var(--lyh-text-mute); font-size: 12px;
+}
+.lyh-footer p + p { margin-top: 4px; }
+
+/* ══════ 响应式 ══════ */
+@media (max-width: 900px) {
+  .lyh-main { grid-template-columns: 1fr; padding: 16px; }
+  .lyh-input-panel, .lyh-result-panel, .lyh-history-panel { grid-column: 1; grid-row: auto; }
+  .lyh-header { padding: 16px; flex-direction: column; gap: 10px; align-items: flex-start; }
+}
